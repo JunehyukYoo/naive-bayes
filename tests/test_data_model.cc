@@ -1,9 +1,9 @@
 #include <catch2/catch.hpp>
 
-#include <core/rename_this_file.h>
+#include <core/data_model.h>
 
 TEST_CASE("Check that 126 is the best class") {
-  REQUIRE(naivebayes::Placeholder().GetBestClass() == "CS 126");
+  REQUIRE(naivebayes::DataModel().GetBestClass() == "CS 126");
 }
 
 /*

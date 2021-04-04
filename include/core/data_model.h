@@ -1,10 +1,18 @@
 #include <string>
+#include <map>
 
 namespace naivebayes {
 
-class Placeholder {
+class DataModel {
  public:
   std::string GetBestClass() const;
+  friend std::istream& operator>>(std::istream& is, DataModel& data_model);
+
+ private:
+  size_t num_total_images_;
+  std::map<int, int> num_class_;
+  const size_t kConstantK = 1;
+  const size_t kNumOfClasses = 10;
 };
 
 }  // namespace naivebayes
