@@ -1,20 +1,32 @@
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 namespace naivebayes {
 
 class DataModel {
  public:
-  std::string GetBestClass() const;
+  DataModel();
+  DataModel(size_t image_dimensions);
   friend std::istream& operator>>(std::istream& is, DataModel& data_model);
+  void ProcessLine();
+  void IncrementNumClassMap(size_t class_);
 
  private:
+  size_t image_dimensions_;
   size_t num_total_images_;
-  std::map<int, int> num_class_;
-  std::vector<std::vector<std::vector<std::vector<int>>>> probabilities_;
-  const size_t kConstantK = 1;
+  std::unordered_map<size_t, size_t> num_class_;
+
+  /** row -> col -> class -> shaded/unshaded */
+  std::vector<std::vector<std::vector<std::vector<int>>>> raw_data_;
+
+  /** class -> probability for each pixel */
+  std::unordered_map<size_t, std::vector<std::vector<float>>> probabilities_;
+
+  const size_t kLaplaceK = 1;
   const size_t kNumOfClasses = 10;
+  const char kShadedOne = '#';
+  const char kShadedTwo = '+';
 };
 
 }  // namespace naivebayes
