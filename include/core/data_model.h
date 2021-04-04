@@ -1,5 +1,6 @@
 #include <string>
 #include <map>
+#include <vector>
 
 namespace naivebayes {
 
@@ -11,6 +12,7 @@ class DataModel {
  private:
   size_t num_total_images_;
   std::map<int, int> num_class_;
+  std::vector<std::vector<std::vector<std::vector<int>>>> probabilities_;
   const size_t kConstantK = 1;
   const size_t kNumOfClasses = 10;
 };
