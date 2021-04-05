@@ -264,4 +264,11 @@ TEST_CASE("Test << operator from save file") {
       REQUIRE(model1.GetRawData()[2][2][3][0] == 0);
     }
   }
+
+  SECTION("Testing priors") {
+    REQUIRE(model1.GetPriorFromClass(0) == Approx(0.143).margin(0.001));
+    REQUIRE(model1.GetPriorFromClass(1) == Approx(0.214).margin(0.001));
+    REQUIRE(model1.GetPriorFromClass(2) == Approx(0.071).margin(0.001));
+    REQUIRE(model1.GetPriorFromClass(3) == Approx(0.143).margin(0.001));
+  }
 }
