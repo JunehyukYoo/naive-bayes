@@ -18,9 +18,9 @@ TEST_CASE("Check that vectors and size_t counts update correctly with << operato
       std::cerr << error_message << std::endl;
   }
   REQUIRE(model.GetImageDimensions() == 3);
-  //REQUIRE(model.GetNumTotalImages() == 2);
+  //REQUIRE(model.GetNumTotalImages() == 3);
   REQUIRE(model.GetNumClass(0) == 1);
-  REQUIRE(model.GetNumClass(1) == 1);
+  REQUIRE(model.GetNumClass(1) == 2);
   REQUIRE(model.GetNumClass(2) == 0);
   SECTION("Testing class = 0, row -> col -> class -> shade") {
     REQUIRE(model.GetRawData()[0][0][0][1] == 1);
@@ -36,17 +36,17 @@ TEST_CASE("Check that vectors and size_t counts update correctly with << operato
     REQUIRE(model.GetRawData()[2][2][0][1] == 1); 
   }
   SECTION("Testing class = 1, row -> col -> class -> shade") {
-    REQUIRE(model.GetRawData()[0][0][1][1] == 0);
-    REQUIRE(model.GetRawData()[0][1][1][1] == 1);
+    REQUIRE(model.GetRawData()[0][0][1][1] == 1);
+    REQUIRE(model.GetRawData()[0][1][1][1] == 2);
     REQUIRE(model.GetRawData()[0][2][1][1] == 0);
 
     REQUIRE(model.GetRawData()[1][0][1][1] == 0);
-    REQUIRE(model.GetRawData()[1][1][1][1] == 1);
+    REQUIRE(model.GetRawData()[1][1][1][1] == 2);
     REQUIRE(model.GetRawData()[1][2][1][1] == 0);
 
-    REQUIRE(model.GetRawData()[2][0][1][1] == 0);
-    REQUIRE(model.GetRawData()[2][1][1][1] == 1);
-    REQUIRE(model.GetRawData()[2][2][1][1] == 0);
+    REQUIRE(model.GetRawData()[2][0][1][1] == 1);
+    REQUIRE(model.GetRawData()[2][1][1][1] == 2);
+    REQUIRE(model.GetRawData()[2][2][1][1] == 1);
   }
 }
 
