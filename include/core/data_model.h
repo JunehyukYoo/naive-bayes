@@ -6,15 +6,47 @@ namespace naivebayes {
 
 class DataModel {
  public:
+  /**
+   * Constructor for the data model that sets the image_dimensions to 28 as default.
+  */
   DataModel();
+  
+  /**
+   * Constructor for data model which allows for n x n images.
+   * @param image_dimensions The side length of the image.
+   */
   DataModel(size_t image_dimensions);
+  
+  /**
+   * Operator that returns an istream that takes in file with images. Parses through the images and updates relevant
+   * information.
+   * @param is The istream.
+   * @param data_model The current data model being fed data.
+   * @return The istream.
+   */
   friend std::istream& operator>>(std::istream& is, DataModel& data_model);
+  
+  /**
+   * Process a line to load data from a text file.
+   */
   void ProcessLine();
+  
+  /**
+   * Increments num_class_ unordered map.
+   * @param class_ The class of image who's count is being incremented.
+   */
   void IncrementNumClassMap(size_t class_);
 
+  /**
+   * Returns the number of a certain class type within the data set.
+   * @param class_ The class type.
+   * @return The number of images that fall under the class type.
+   */
+  size_t GetNumClass(size_t class_);
+  
+  /** Getters */
   size_t GetImageDimensions() const;
   size_t GetNumTotalImages() const;
-  size_t GetNumClass(size_t class_);
   std::vector<std::vector<std::vector<std::vector<size_t>>>> GetRawData() const;
 
  private:

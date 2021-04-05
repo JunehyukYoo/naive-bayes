@@ -65,15 +65,13 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
         count = 1;
     }
     if (count == 1) {
-      //check which class it is, update num_total_images and map
-      //type_class = class
+      //check which class it is, update relevant variables
       line.erase(line.find_last_not_of(" \n\r\t") + 1);
       type_class = stoi(line);
       data_model.num_total_images_++;
       data_model.IncrementNumClassMap(type_class);
     } else {
       //method to update the raw_data array, pass the (count-2) as the row and the charAt index is the col of the image
-      //add incremement
       for (size_t col = 0; col < data_model.image_dimensions_; col++) {
         if (line.at(col) == data_model.kShadedOne || line.at(col) == data_model.kShadedTwo) {
           data_model.raw_data_[count - 2][col][type_class][1]++;
