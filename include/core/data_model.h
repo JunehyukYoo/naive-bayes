@@ -12,13 +12,18 @@ class DataModel {
   void ProcessLine();
   void IncrementNumClassMap(size_t class_);
 
+  size_t GetImageDimensions() const;
+  size_t GetNumTotalImages() const;
+  size_t GetNumClass(size_t class_);
+  std::vector<std::vector<std::vector<std::vector<size_t>>>> GetRawData() const;
+
  private:
   size_t image_dimensions_;
   size_t num_total_images_;
   std::unordered_map<size_t, size_t> num_class_;
 
   /** row -> col -> class -> shaded/unshaded */
-  std::vector<std::vector<std::vector<std::vector<int>>>> raw_data_;
+  std::vector<std::vector<std::vector<std::vector<size_t>>>> raw_data_;
 
   /** class -> probability for each pixel */
   std::unordered_map<size_t, std::vector<std::vector<float>>> probabilities_;

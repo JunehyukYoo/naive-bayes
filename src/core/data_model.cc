@@ -6,10 +6,50 @@
 namespace naivebayes {
 DataModel::DataModel() {
   image_dimensions_ = 28;
+  for (size_t i = 0; i < kNumOfClasses; i++) {
+    num_class_[i] = 0;
+    std::vector<float> initial_vec_inner;
+    std::vector<std::vector<float>> initial_vec_outer;
+    for (size_t row = 0; row < image_dimensions_; row++) {
+      initial_vec_inner.push_back(0.5);
+      for (size_t col = 0; col < image_dimensions_; col++) {
+        //raw_data_[row][col][i][0] = 0;
+        //raw_data_[row][col][i][1] = 0;
+      }
+    }
+    for (size_t j = 0; j < image_dimensions_; j++) {
+        initial_vec_outer.push_back(initial_vec_inner);
+    }
+    probabilities_[i] = initial_vec_outer;
+  }
+  //std::vector<std::vector<size_t>> two(10, std::vector<size_t>(2));
+  //std::vector<std::vector<std::vector<size_t>>> three(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2)));
+  std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2))));
+  raw_data_ = sized_array;
 }
 
 DataModel::DataModel(size_t image_dimensions) {
   image_dimensions_ = image_dimensions;
+  for (size_t i = 0; i < kNumOfClasses; i++) {
+    num_class_[i] = 0;
+    std::vector<float> initial_vec_inner;
+    std::vector<std::vector<float>> initial_vec_outer;
+    for (size_t row = 0; row < image_dimensions_; row++) {
+        initial_vec_inner.push_back(0.5);
+        for (size_t col = 0; col < image_dimensions_; col++) {
+            //raw_data_[row][col][i][0] = 0;
+            //raw_data_[row][col][i][1] = 0;
+        }
+    }
+    for (size_t j = 0; j < image_dimensions_; j++) {
+        initial_vec_outer.push_back(initial_vec_inner);
+    }
+    probabilities_[i] = initial_vec_outer;
+  }
+  //std::vector<std::vector<size_t>> two(10, std::vector<size_t>(2));
+  //std::vector<std::vector<std::vector<size_t>>> three(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2)));
+  std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2))));
+  raw_data_ = sized_array;
 }
 
 void DataModel::IncrementNumClassMap(size_t class_) {
@@ -52,5 +92,28 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
   }
   return is;
 }
+
+size_t DataModel::GetImageDimensions() const {
+  return image_dimensions_;
+}
+
+size_t DataModel::GetNumTotalImages() const {
+  return num_total_images_;
+}
+
+size_t DataModel::GetNumClass(size_t class_) {
+  std::unordered_map<size_t, size_t>::iterator itr;
+  for (itr = num_class_.begin(); itr != num_class_.end(); itr++) {
+    if (itr->first == class_) {
+        return itr->second;
+    }
+  }
+  return 0;
+}
+
+std::vector<std::vector<std::vector<std::vector<size_t>>>> DataModel::GetRawData() const {
+  return raw_data_;
+}
+
 
 }  // namespace naivebayes
