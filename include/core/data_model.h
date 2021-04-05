@@ -74,6 +74,7 @@ class DataModel {
   std::unordered_map<size_t, size_t> GetNumClass() const;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> GetRawData() const;
   std::unordered_map<size_t, std::vector<std::vector<float>>> GetShadedProbabilities() const;
+  std::unordered_map<size_t, std::vector<std::vector<float>>> GetUnshadedProbabilities() const;
   std::unordered_map<size_t, float> GetPriors() const;
 
  private:
@@ -91,6 +92,9 @@ class DataModel {
 
   /** class -> probability for each pixel to be shaded*/
   std::unordered_map<size_t, std::vector<std::vector<float>>> shaded_probabilities_;
+
+  /** class -> probability for each pixel to be unshaded*/
+  std::unordered_map<size_t, std::vector<std::vector<float>>> unshaded_probabilities_;
 
   /** MODEL CONSTANTS */
   const size_t kLaplaceK = 1;

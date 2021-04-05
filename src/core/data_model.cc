@@ -17,7 +17,8 @@ DataModel::DataModel() {
     for (size_t j = 0; j < image_dimensions_; j++) {
         initial_vec_outer.push_back(initial_vec_inner);
     }
-      shaded_probabilities_[i] = initial_vec_outer;
+    shaded_probabilities_[i] = initial_vec_outer;
+    unshaded_probabilities_[i] = initial_vec_outer;
   }
   num_total_images_ = 0;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(2))));
@@ -37,7 +38,8 @@ DataModel::DataModel(size_t image_dimensions) {
     for (size_t j = 0; j < image_dimensions_; j++) {
         initial_vec_outer.push_back(initial_vec_inner);
     }
-      shaded_probabilities_[i] = initial_vec_outer;
+    shaded_probabilities_[i] = initial_vec_outer;
+    unshaded_probabilities_[i] = initial_vec_outer;
   }
   num_total_images_ = 0;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2))));
@@ -65,12 +67,12 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     
     if (!is_save_file) {
       data_model.ProcessData(count, data_model, line, type_class);
+      data_model.UpdatePriors();
+      data_model.UpdateProbabilities();
     } else {
       data_model.LoadSave(count, data_model, line);
     }
   }
-  data_model.UpdatePriors();
-  data_model.UpdateProbabilities();
   return is;
 }
 
@@ -85,6 +87,15 @@ std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
   os << std::endl;
   
   for (const auto &element : data_model.GetShadedProbabilities()) {
+    for (size_t row = 0; row < data_model.image_dimensions_; row++) {
+      for (size_t col = 0; col < data_model.image_dimensions_; col++) {
+        os << std::to_string(element.second[row][col]) << " ";
+      }
+    }
+    os<<std::endl;
+  }
+
+  for (const auto &element : data_model.GetUnshadedProbabilities()) {
     for (size_t row = 0; row < data_model.image_dimensions_; row++) {
       for (size_t col = 0; col < data_model.image_dimensions_; col++) {
         os << std::to_string(element.second[row][col]) << " ";
@@ -128,9 +139,11 @@ void DataModel::UpdateProbabilities() {
   for (auto &element : shaded_probabilities_) {
     for (size_t row = 0; row < image_dimensions_; row++) {
       for (size_t col = 0; col < image_dimensions_; col++) {
-        auto numerator = static_cast<float>(kLaplaceK + raw_data_[row][col][element.first][1]);
+        auto numerator_shaded = static_cast<float>(kLaplaceK + raw_data_[row][col][element.first][1]);
+        auto numerator_unshaded = static_cast<float>(kLaplaceK + raw_data_[row][col][element.first][0]);
         auto denominator = static_cast<float>(2 * kLaplaceK + GetNumPerClass(element.first));
-        element.second[row][col] = numerator / denominator;
+        element.second[row][col] = numerator_shaded / denominator;
+        element.second[row][col] = numerator_unshaded / denominator;
       }
     }
   }
@@ -199,7 +212,22 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       i++;
     }
     data_model.shaded_probabilities_[count - 5] = prob_array;
-  } else if (count >= (5 + data_model.kNumOfClasses)) {
+  } else if (count >= (5 + data_model.kNumOfClasses) && count < (5 + 2 * data_model.kNumOfClasses)) {
+    std::stringstream line_stream(line);
+    std::string temp;
+    std::vector<std::vector<float>> prob_array(data_model.image_dimensions_, std::vector<float>(data_model.image_dimensions_));
+    size_t i = 0;
+    while (line_stream >> temp && i <= data_model.kDefaultDimensions) {
+      if (i % data_model.image_dimensions_ == 0 && i != 0) {
+        row++;
+        col = 0;
+      }
+      prob_array[row][col] = stof(temp);
+      col++;
+      i++;
+    }
+    data_model.unshaded_probabilities_[count - 5] = prob_array;
+  } else if (count >= (5 + 2 * data_model.kNumOfClasses)) {
     std::stringstream line_stream(line);
     std::string temp;
     size_t i = 0;
@@ -245,6 +273,10 @@ size_t DataModel::GetImageDimensions() const {
 
 size_t DataModel::GetNumTotalImages() const {
   return num_total_images_;
+}
+
+std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetUnshadedProbabilities() const {
+  return unshaded_probabilities_;
 }
 
 }  // namespace naivebayes
