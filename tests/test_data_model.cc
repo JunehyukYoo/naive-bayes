@@ -7,6 +7,7 @@
 using namespace naivebayes;
 
 const std::string file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testtrainingimages.txt";
+const std::string save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/savefile.txt";
 const std::string error_message = "Could not open file.";
 
 TEST_CASE("Test variables for correct initialization before feeding the model data") {
@@ -47,7 +48,7 @@ TEST_CASE("Test variables for correct initialization before feeding the model da
   }
 }
 
-TEST_CASE("Test << operator from data, raw data (4 dimensional vector)") {
+TEST_CASE("Test << operator from data, building model") {
   DataModel model(3);
   std::ifstream input_file(file_path);
   if (input_file.is_open()) {
@@ -157,5 +158,110 @@ TEST_CASE("Test << operator from data, raw data (4 dimensional vector)") {
    REQUIRE(model.GetPriorFromClass(1) == Approx(0.214).margin(0.001));
    REQUIRE(model.GetPriorFromClass(2) == Approx(0.071).margin(0.001));
    REQUIRE(model.GetPriorFromClass(3) == Approx(0.143).margin(0.001));
+  }
+}
+
+TEST_CASE("Test << operator from save file") {
+  DataModel model1(3);
+  std::ifstream input_file(save_file_path);
+  if (input_file.is_open()) {
+    input_file >> model1;
+  } else {
+    std::cerr << error_message << std::endl;
+  }
+  REQUIRE(model1.GetImageDimensions() == 3);
+  REQUIRE(model1.GetNumTotalImages() == 4);
+  REQUIRE(model1.GetNumPerClass(0) == 1);
+  REQUIRE(model1.GetNumPerClass(1) == 2);
+  REQUIRE(model1.GetNumPerClass(2) == 0);
+  REQUIRE(model1.GetNumPerClass(3) == 1);
+
+  SECTION("Testing class = 0, 4D vector, row -> col -> class -> shade") {
+    SECTION("Shaded") {
+      REQUIRE(model1.GetRawData()[0][0][0][1] == 1);
+      REQUIRE(model1.GetRawData()[0][1][0][1] == 1);
+      REQUIRE(model1.GetRawData()[0][2][0][1] == 1);
+
+      REQUIRE(model1.GetRawData()[1][0][0][1] == 1);
+      REQUIRE(model1.GetRawData()[1][1][0][1] == 0);
+      REQUIRE(model1.GetRawData()[1][2][0][1] == 1);
+
+      REQUIRE(model1.GetRawData()[2][0][0][1] == 1);
+      REQUIRE(model1.GetRawData()[2][1][0][1] == 1);
+      REQUIRE(model1.GetRawData()[2][2][0][1] == 1);
+    }
+
+    SECTION("Shaded") {
+      REQUIRE(model1.GetRawData()[0][0][0][0] == 0);
+      REQUIRE(model1.GetRawData()[0][1][0][0] == 0);
+      REQUIRE(model1.GetRawData()[0][2][0][0] == 0);
+
+      REQUIRE(model1.GetRawData()[1][0][0][0] == 0);
+      REQUIRE(model1.GetRawData()[1][1][0][0] == 1);
+      REQUIRE(model1.GetRawData()[1][2][0][0] == 0);
+
+      REQUIRE(model1.GetRawData()[2][0][0][0] == 0);
+      REQUIRE(model1.GetRawData()[2][1][0][0] == 0);
+      REQUIRE(model1.GetRawData()[2][2][0][0] == 0);
+    }
+  }
+    
+  SECTION("Testing class = 1, 4D vector, row -> col -> class -> shade") {
+    SECTION("Shaded") {
+      REQUIRE(model1.GetRawData()[0][0][1][1] == 1);
+      REQUIRE(model1.GetRawData()[0][1][1][1] == 2);
+      REQUIRE(model1.GetRawData()[0][2][1][1] == 0);
+
+      REQUIRE(model1.GetRawData()[1][0][1][1] == 0);
+      REQUIRE(model1.GetRawData()[1][1][1][1] == 2);
+      REQUIRE(model1.GetRawData()[1][2][1][1] == 0);
+
+      REQUIRE(model1.GetRawData()[2][0][1][1] == 1);
+      REQUIRE(model1.GetRawData()[2][1][1][1] == 2);
+      REQUIRE(model1.GetRawData()[2][2][1][1] == 1);
+    }
+
+    SECTION("Unshaded") {
+      REQUIRE(model1.GetRawData()[0][0][1][0] == 1);
+      REQUIRE(model1.GetRawData()[0][1][1][0] == 0);
+      REQUIRE(model1.GetRawData()[0][2][1][0] == 2);
+
+      REQUIRE(model1.GetRawData()[1][0][1][0] == 2);
+      REQUIRE(model1.GetRawData()[1][1][1][0] == 0);
+      REQUIRE(model1.GetRawData()[1][2][1][0] == 2);
+
+      REQUIRE(model1.GetRawData()[2][0][1][0] == 1);
+      REQUIRE(model1.GetRawData()[2][1][1][0] == 0);
+      REQUIRE(model1.GetRawData()[2][2][1][0] == 1);
+    }
+  }
+  SECTION("Testing class = 3, 4D vector, row -> col -> class -> shade") {
+    SECTION("Shaded") {
+      REQUIRE(model1.GetRawData()[0][0][3][1] == 1);
+      REQUIRE(model1.GetRawData()[0][1][3][1] == 1);
+      REQUIRE(model1.GetRawData()[0][2][3][1] == 1);
+
+      REQUIRE(model1.GetRawData()[1][0][3][1] == 0);
+      REQUIRE(model1.GetRawData()[1][1][3][1] == 1);
+      REQUIRE(model1.GetRawData()[1][2][3][1] == 1);
+
+      REQUIRE(model1.GetRawData()[2][0][3][1] == 1);
+      REQUIRE(model1.GetRawData()[2][1][3][1] == 1);
+      REQUIRE(model1.GetRawData()[2][2][3][1] == 1);
+    }
+
+    SECTION("Unshaded") {
+      REQUIRE(model1.GetRawData()[0][0][3][0] == 0);
+      REQUIRE(model1.GetRawData()[0][1][3][0] == 0);
+      REQUIRE(model1.GetRawData()[0][2][3][0] == 0);
+
+      REQUIRE(model1.GetRawData()[1][0][3][0] == 1);
+      REQUIRE(model1.GetRawData()[1][1][3][0] == 0);
+      REQUIRE(model1.GetRawData()[1][2][3][0] == 0);
+
+      REQUIRE(model1.GetRawData()[2][0][3][0] == 0);
+      REQUIRE(model1.GetRawData()[2][1][3][0] == 0);
+      REQUIRE(model1.GetRawData()[2][2][3][0] == 0);
+    }
   }
 }
