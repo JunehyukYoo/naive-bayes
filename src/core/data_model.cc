@@ -79,7 +79,7 @@ std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
   os << std::to_string(data_model.num_total_images_) << std::endl;
   
   for (const auto &element : data_model.GetNumClass()) {
-    os << std::to_string(element.second);
+    os << std::to_string(element.second) << " ";
   }
   os << std::endl;
   
@@ -91,18 +91,6 @@ std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
     }
     os<<std::endl;
   }
-  
-  /**
-  for (size_t row = 0; row < 3; row++) {
-    for (size_t col = 0; col < 3; col++) {
-      for (size_t class_ = 0; class_ < 10; class_++) {
-        for (size_t shade = 0; shade < 2; shade++) {
-          os << std::to_string(data_model.GetRawData()[row][col][class_][shade]) << std::endl;
-        }
-      }
-    }
-  }
-  */
   
   for (size_t class_ = 0; class_ < 10; class_++) {
     for (size_t row = 0; row < 3; row++) {
@@ -177,68 +165,50 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
   } else if (count == 3) {
     data_model.num_total_images_ = stoi(line);
   } else if (count == 4) {
-    for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
-      data_model.num_class_[i] = stoi(std::to_string(line.at(i)));
+    std::stringstream line_stream(line);
+    std::string temp;
+    size_t class_ = 0;
+    while (line_stream >> temp && class_ <= data_model.kNumOfClasses) {
+      data_model.num_class_[class_] = stoi(temp);
+      class_++;
     }
   } else if (count >= 5 && count < (5 + data_model.kNumOfClasses)) {
     std::stringstream line_stream(line);
     std::string temp;
     std::vector<std::vector<float>> prob_array(data_model.image_dimensions_, std::vector<float>(data_model.image_dimensions_));
-    while (line_stream >> temp) {
-      for (size_t i = 0; i < num_elements_per_line; i++) {
-        if (i % data_model.image_dimensions_ == 0 && i != 0) {
+    size_t i = 0;
+    while (line_stream >> temp && i <= data_model.kDefaultDimensions) {
+      if (i % data_model.image_dimensions_ == 0 && i != 0) {
           row++;
           col = 0;
-        }
-        prob_array[row][col] = stof(temp);
-        col++;
-      }
-      break;
-    }
-    /*
-    for (size_t i = 0; i < num_elements_per_line; i++, line_stream >> temp) {
-      if (i % data_model.image_dimensions_ == 0) {
-        row++;
-        col = 0;
       }
       prob_array[row][col] = stof(temp);
       col++;
+      i++;
     }
-     */
     data_model.probabilities_[count - 5] = prob_array;
   } else if (count >= (5 + data_model.kNumOfClasses)) {
     //UPDATE 4D vector somehow lol
     std::stringstream line_stream(line);
     std::string temp;
-    while (line_stream >> temp) {
-      for (size_t i = 0; i < 2 * num_elements_per_line; i++) {
-        if (i % (2 * data_model.image_dimensions_) == 0 && i != 0) {
-          row++;
-          col = 0;
-        }
-
-        if (i % 2 == 0) {
-          data_model.raw_data_[row][col][count - data_model.kNumOfClasses - 5][0] = stoi(temp);
-        } else {
-          data_model.raw_data_[row][col][count - data_model.kNumOfClasses - 5][1] = stoi(temp);
-        }
-      }
-      break;
-    }
-    /*
-    for (size_t i = 0; i < 2 * num_elements_per_line; i++, line_stream >> temp) {
-      if (i % (2 * data_model.image_dimensions_) == 0) {
+    size_t i = 0;
+    while (line_stream >> temp && i < (2 * num_elements_per_line)) {
+      if (i % (2 * data_model.image_dimensions_) == 0 && i != 0) {
         row++;
         col = 0;
-      }  
-      
+      }
+
       if (i % 2 == 0) {
         data_model.raw_data_[row][col][count - data_model.kNumOfClasses - 5][0] = stoi(temp);
       } else {
         data_model.raw_data_[row][col][count - data_model.kNumOfClasses - 5][1] = stoi(temp);
       }
+      
+      if (i % 2 != 0) {
+        col++;
+      }
+      i++;
     }
-     */
   }
   count++;
 }
