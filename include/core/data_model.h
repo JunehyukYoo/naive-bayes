@@ -39,6 +39,9 @@ class DataModel {
    */
   void ProcessLine();
   
+  /** Updates priors list */
+  void UpdatePriors();
+  
   /**
    * Increments num_class_ unordered map.
    * @param class_ The class of image who's count is being incremented.
@@ -50,7 +53,14 @@ class DataModel {
    * @param class_ The class type.
    * @return The number of images that fall under the class type.
    */
-  size_t GetNumPerClass(size_t class_);
+  size_t GetNumPerClass(size_t class_) const;
+  
+  /**
+   * Returns the prior value of a certain class type.
+   * @param class_ The class type.
+   * @return The prior of the class type.
+   */
+  float GetPriorFromClass(size_t class_) const;
   
   /** Getters */
   size_t GetImageDimensions() const;
@@ -58,6 +68,7 @@ class DataModel {
   std::unordered_map<size_t, size_t> GetNumClass() const;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> GetRawData() const;
   std::unordered_map<size_t, std::vector<std::vector<float>>> GetProbabilities() const;
+  std::unordered_map<size_t, float> GetPriors() const;
 
  private:
   size_t image_dimensions_;
@@ -68,6 +79,9 @@ class DataModel {
 
   /** row -> col -> class -> shaded/unshaded */
   std::vector<std::vector<std::vector<std::vector<size_t>>>> raw_data_;
+  
+  /** class -> prior */
+  std::unordered_map<size_t, float> priors_;
 
   /** class -> probability for each pixel */
   std::unordered_map<size_t, std::vector<std::vector<float>>> probabilities_;
@@ -75,6 +89,7 @@ class DataModel {
   const size_t kLaplaceK = 1;
   const size_t kNumOfClasses = 10;
   const size_t kDefaultDimensions = 28;
+  const std::string kSaveTitle = "SAVE_FILE";
   const char kShadedOne = '#';
   const char kShadedTwo = '+';
 };

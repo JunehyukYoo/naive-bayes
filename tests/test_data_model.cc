@@ -39,9 +39,15 @@ TEST_CASE("Test variables for correct initialization before feeding the model da
       }
     }
   }
+  
+  SECTION("Priors test") {
+    for (const auto &element : model.GetPriors()) {
+      REQUIRE(element.second == 0);
+    }
+  }
 }
 
-TEST_CASE("Test << operator, raw data (4 dimensional vector)") {
+TEST_CASE("Test << operator from data, raw data (4 dimensional vector)") {
   DataModel model(3);
   std::ifstream input_file(file_path);
   if (input_file.is_open()) {
@@ -51,7 +57,7 @@ TEST_CASE("Test << operator, raw data (4 dimensional vector)") {
   }
   
   REQUIRE(model.GetImageDimensions() == 3);
-  //REQUIRE(model.GetNumTotalImages() == 4);
+  REQUIRE(model.GetNumTotalImages() == 4);
   REQUIRE(model.GetNumPerClass(0) == 1);
   REQUIRE(model.GetNumPerClass(1) == 2);
   REQUIRE(model.GetNumPerClass(2) == 0);
@@ -144,5 +150,12 @@ TEST_CASE("Test << operator, raw data (4 dimensional vector)") {
       REQUIRE(model.GetRawData()[2][1][3][0] == 0);
       REQUIRE(model.GetRawData()[2][2][3][0] == 0);
     }
+  }
+  
+  SECTION("Testing priors") {
+   REQUIRE(model.GetPriorFromClass(0) == Approx(0.143).margin(0.001));
+   REQUIRE(model.GetPriorFromClass(1) == Approx(0.214).margin(0.001));
+   REQUIRE(model.GetPriorFromClass(2) == Approx(0.071).margin(0.001));
+   REQUIRE(model.GetPriorFromClass(3) == Approx(0.143).margin(0.001));
   }
 }

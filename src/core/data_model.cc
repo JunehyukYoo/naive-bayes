@@ -8,6 +8,7 @@ DataModel::DataModel() {
   image_dimensions_ = kDefaultDimensions;
   for (size_t i = 0; i < kNumOfClasses; i++) {
     num_class_[i] = 0;
+    priors_[i] = 0;
     std::vector<float> initial_vec_inner;
     std::vector<std::vector<float>> initial_vec_outer;
     for (size_t j = 0; j < image_dimensions_; j++) {
@@ -18,6 +19,7 @@ DataModel::DataModel() {
     }
     probabilities_[i] = initial_vec_outer;
   }
+  num_total_images_ = 0;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(2))));
   raw_data_ = sized_array;
 }
@@ -26,6 +28,7 @@ DataModel::DataModel(size_t image_dimensions) {
   image_dimensions_ = image_dimensions;
   for (size_t i = 0; i < kNumOfClasses; i++) {
     num_class_[i] = 0;
+    priors_[i] = 0;
     std::vector<float> initial_vec_inner;
     std::vector<std::vector<float>> initial_vec_outer;
     for (size_t j = 0; j < image_dimensions_; j++) {
@@ -36,6 +39,7 @@ DataModel::DataModel(size_t image_dimensions) {
     }
     probabilities_[i] = initial_vec_outer;
   }
+  num_total_images_ = 0;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2))));
   raw_data_ = sized_array;
 }
@@ -55,31 +59,33 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
   size_t type_class;
   size_t one_image_line_req = data_model.image_dimensions_ + 1; //29 as default
   while (std::getline(is, line)) {
-    if (count > one_image_line_req) {
+      if (count > one_image_line_req) {
         count = 1;
-    }
-    if (count == 1) {
-      //check which class it is, update relevant variables
-      //line.erase(line.find_last_not_of(" \n\r\t") + 1);
-      type_class = stoi(line);
-      data_model.num_total_images_++;
-      data_model.IncrementNumClassMap(type_class);
-    } else {
-      //method to update the raw_data array, pass the (count-2) as the row and the charAt index is the col of the image
-      for (size_t col = 0; col < data_model.image_dimensions_; col++) {
-        if (line.at(col) == data_model.kShadedOne || line.at(col) == data_model.kShadedTwo) {
-          data_model.raw_data_[count - 2][col][type_class][1]++;
-        } else {
-          data_model.raw_data_[count - 2][col][type_class][0]++;
+      }
+      if (count == 1) {
+        //check which class it is, update relevant variables
+        //line.erase(line.find_last_not_of(" \n\r\t") + 1);
+        type_class = stoi(line);
+        data_model.num_total_images_++;
+        data_model.IncrementNumClassMap(type_class);
+      } else {
+        //method to update the raw_data array, pass the (count-2) as the row and the charAt index is the col of the image
+        for (size_t col = 0; col < data_model.image_dimensions_; col++) {
+          if (line.at(col) == data_model.kShadedOne || line.at(col) == data_model.kShadedTwo) {
+            data_model.raw_data_[count - 2][col][type_class][1]++;
+          } else {
+            data_model.raw_data_[count - 2][col][type_class][0]++;
+          }
         }
       }
+      count++;
     }
-    count++;
-  }
+  data_model.UpdatePriors();
   return is;
 }
 
 std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
+  os << data_model.kSaveTitle << std::endl;
   os << std::to_string(data_model.image_dimensions_) << std::endl;
   os << std::to_string(data_model.num_total_images_) << std::endl;
   for (const auto &element : data_model.GetNumClass()) {
@@ -112,8 +118,8 @@ size_t DataModel::GetNumTotalImages() const {
   return num_total_images_;
 }
 
-size_t DataModel::GetNumPerClass(size_t class_) {
-  std::unordered_map<size_t, size_t>::iterator itr;
+size_t DataModel::GetNumPerClass(size_t class_) const {
+  std::unordered_map<size_t, size_t>::const_iterator itr;
   for (itr = num_class_.begin(); itr != num_class_.end(); itr++) {
     if (itr->first == class_) {
         return itr->second;
@@ -132,6 +138,31 @@ std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetProbab
 
 std::unordered_map<size_t, size_t> DataModel::GetNumClass() const {
   return num_class_;
+}
+
+void DataModel::ProcessLine() {
+
+}
+
+void DataModel::UpdatePriors() {
+  for (auto &element : priors_) {
+    auto numerator = static_cast<float>(kLaplaceK + GetNumPerClass(element.first));
+    auto denominator = static_cast<float>(kLaplaceK * kNumOfClasses + num_total_images_);
+    element.second = numerator/denominator;
+  }
+}
+
+std::unordered_map<size_t, float> DataModel::GetPriors() const {
+  return priors_;
+}
+
+float DataModel::GetPriorFromClass(size_t class_) const {
+  for (const auto &element : priors_) {
+    if (element.first == class_) {
+      return element.second;
+    }
+  }
+  return -1;
 }
 
 
