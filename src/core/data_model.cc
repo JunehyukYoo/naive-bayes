@@ -211,7 +211,7 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       col++;
       i++;
     }
-    data_model.shaded_probabilities_[count - 5] = prob_array;
+    data_model.unshaded_probabilities_[count - 5] = prob_array;
   } else if (count >= (5 + data_model.kNumOfClasses) && count < (5 + 2 * data_model.kNumOfClasses)) {
     std::stringstream line_stream(line);
     std::string temp;
@@ -226,7 +226,7 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       col++;
       i++;
     }
-    data_model.unshaded_probabilities_[count - 5] = prob_array;
+    data_model.shaded_probabilities_[count - 5] = prob_array;
   } else if (count >= (5 + 2 * data_model.kNumOfClasses)) {
     std::stringstream line_stream(line);
     std::string temp;

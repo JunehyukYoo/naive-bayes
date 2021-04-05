@@ -63,6 +63,9 @@ TEST_CASE("Test << operator from data, building model") {
   REQUIRE(model.GetNumPerClass(1) == 2);
   REQUIRE(model.GetNumPerClass(2) == 0);
   REQUIRE(model.GetNumPerClass(3) == 1);
+  for (size_t i = 4; i < 10; i++) {
+    REQUIRE(model.GetNumPerClass(i) == 0);
+  }
   
   SECTION("Testing class = 0, 4D vector, row -> col -> class -> shade") {
     SECTION("Shaded") {
@@ -154,10 +157,34 @@ TEST_CASE("Test << operator from data, building model") {
   }
   
   SECTION("Testing priors") {
-   REQUIRE(model.GetPriorFromClass(0) == Approx(0.143).margin(0.001));
-   REQUIRE(model.GetPriorFromClass(1) == Approx(0.214).margin(0.001));
-   REQUIRE(model.GetPriorFromClass(2) == Approx(0.071).margin(0.001));
-   REQUIRE(model.GetPriorFromClass(3) == Approx(0.143).margin(0.001));
+    REQUIRE(model.GetPriorFromClass(0) == Approx(0.143).margin(0.001));
+    REQUIRE(model.GetPriorFromClass(1) == Approx(0.214).margin(0.001));
+    REQUIRE(model.GetPriorFromClass(2) == Approx(0.071).margin(0.001));
+    REQUIRE(model.GetPriorFromClass(3) == Approx(0.143).margin(0.001));
+  }
+  
+  SECTION("Testing probabilities") {
+    SECTION("Unshaded") {
+      for (const auto &element : model.GetUnshadedProbabilities()) {
+        for (size_t row = 0; row < 3; row++) {
+          for (size_t col = 0; col < 3; col++) {
+            if (element.first == 0) {
+              if (row == 1 & col == 1) {
+                REQUIRE(element.second[row][col] == Approx(0.333));
+              } else {
+                REQUIRE(element.second[row][col] == Approx(0.667)); 
+              }
+            } else {
+              REQUIRE(element.second[row][col] == 0.5);
+            }
+          }
+        }
+      }
+    }
+    
+    SECTION("Shaded") {
+      REQUIRE(1 < 2);
+    }
   }
 }
 
