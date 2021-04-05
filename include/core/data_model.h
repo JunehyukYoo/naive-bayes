@@ -30,6 +30,7 @@ class DataModel {
 
   const size_t kLaplaceK = 1;
   const size_t kNumOfClasses = 10;
+  const size_t kDefaultDimensions = 28;
   const char kShadedOne = '#';
   const char kShadedTwo = '+';
 };

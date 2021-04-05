@@ -5,7 +5,7 @@
 
 namespace naivebayes {
 DataModel::DataModel() {
-  image_dimensions_ = 28;
+  image_dimensions_ = kDefaultDimensions;
   for (size_t i = 0; i < kNumOfClasses; i++) {
     num_class_[i] = 0;
     std::vector<float> initial_vec_inner;
