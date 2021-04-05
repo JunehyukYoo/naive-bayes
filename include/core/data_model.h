@@ -27,6 +27,14 @@ class DataModel {
   friend std::istream& operator>>(std::istream& is, DataModel& data_model);
   
   /**
+   * Operator used to write output files to save the current model by manipulating the ostream. 
+   * @param os The ostream.
+   * @param data_model The current data model being saved.
+   * @return The ostream.
+   */
+  friend std::ostream& operator<<(std::ostream& os, DataModel& data_model);
+  
+  /**
    * Process a line to load data from a text file.
    */
   void ProcessLine();

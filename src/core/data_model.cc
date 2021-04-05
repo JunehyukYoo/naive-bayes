@@ -79,6 +79,12 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
   return is;
 }
 
+std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
+  //comment for indent
+  
+  return os;
+}
+
 size_t DataModel::GetImageDimensions() const {
   return image_dimensions_;
 }
