@@ -31,12 +31,10 @@ TEST_CASE("Test variables for correct initialization before feeding the model da
   }
   
   SECTION("Probabilities test") {
-    std::unordered_map<size_t, std::vector<std::vector<float>>>::const_iterator itr;
-    for (itr = model.GetProbabilities().begin(); itr != model.GetProbabilities().end(); itr++) {
+    for (const auto &element : model.GetProbabilities()) {
       for (size_t row = 0; row < 3; row++) {
         for (size_t col = 0; col < 3; col++) {
-          std::vector<std::vector<float>> prob = itr->second;
-          REQUIRE(prob[row][col] == 0.5);
+          REQUIRE(element.second[row][col] == 0.5);
         }
       }
     }
