@@ -54,11 +54,10 @@ void DataModel::IncrementNumClassMap(size_t class_) {
 }
 
 std::istream &operator>>(std::istream &is, DataModel &data_model) {
-  bool is_save_file;
+  bool is_save_file = false;
   std::string line;
   size_t count = 1;
   size_t type_class;
-  //size_t one_image_line_req = data_model.image_dimensions_ + 1; //29 as default
   while (std::getline(is, line)) {
     if (line == data_model.kSaveTitle) {
       is_save_file = true;
@@ -67,7 +66,7 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     if (!is_save_file) {
       data_model.ProcessData(count, data_model, line, type_class);
     } else {
-      //READ SAVE FILE METHOD
+      data_model.LoadSave(count, data_model, line);
     }
   }
   data_model.UpdatePriors();
@@ -78,16 +77,22 @@ std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
   os << data_model.kSaveTitle << std::endl;
   os << std::to_string(data_model.image_dimensions_) << std::endl;
   os << std::to_string(data_model.num_total_images_) << std::endl;
+  
   for (const auto &element : data_model.GetNumClass()) {
-    os << std::to_string(element.second) << std::endl;
+    os << std::to_string(element.second);
   }
+  os << std::endl;
+  
   for (const auto &element : data_model.GetProbabilities()) {
     for (size_t row = 0; row < data_model.image_dimensions_; row++) {
       for (size_t col = 0; col < data_model.image_dimensions_; col++) {
-        os << std::to_string(element.second[row][col]) << std::endl;
+        os << std::to_string(element.second[row][col]) << " ";
       }
     }
+    os<<std::endl;
   }
+  
+  /**
   for (size_t row = 0; row < 3; row++) {
     for (size_t col = 0; col < 3; col++) {
       for (size_t class_ = 0; class_ < 10; class_++) {
@@ -97,15 +102,19 @@ std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
       }
     }
   }
+  */
+  
+  for (size_t class_ = 0; class_ < 10; class_++) {
+    for (size_t row = 0; row < 3; row++) {
+      for (size_t col = 0; col < 3; col++) {
+        for (size_t shade = 0; shade < 2; shade++) {
+          os << std::to_string(data_model.GetRawData()[row][col][class_][shade]) << " ";
+        }
+      }
+    }
+    os << std::endl;
+  }
   return os;
-}
-
-size_t DataModel::GetImageDimensions() const {
-  return image_dimensions_;
-}
-
-size_t DataModel::GetNumTotalImages() const {
-  return num_total_images_;
 }
 
 size_t DataModel::GetNumPerClass(size_t class_) const {
@@ -118,28 +127,12 @@ size_t DataModel::GetNumPerClass(size_t class_) const {
   return 0;
 }
 
-std::vector<std::vector<std::vector<std::vector<size_t>>>> DataModel::GetRawData() const {
-  return raw_data_;
-}
-
-std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetProbabilities() const {
-  return probabilities_;
-}
-
-std::unordered_map<size_t, size_t> DataModel::GetNumClass() const {
-  return num_class_;
-}
-
 void DataModel::UpdatePriors() {
   for (auto &element : priors_) {
     auto numerator = static_cast<float>(kLaplaceK + GetNumPerClass(element.first));
     auto denominator = static_cast<float>(kLaplaceK * kNumOfClasses + num_total_images_);
     element.second = numerator/denominator;
   }
-}
-
-std::unordered_map<size_t, float> DataModel::GetPriors() const {
-  return priors_;
 }
 
 float DataModel::GetPriorFromClass(size_t class_) const {
@@ -173,6 +166,76 @@ void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &l
     }
   }
   count++;
+}
+
+void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line) {
+  size_t num_elements_per_line = image_dimensions_ * image_dimensions_;
+  size_t row = 0;
+  size_t col = 0;
+  if (count == 1) {
+    return;
+  } else if (count == 2) {
+    image_dimensions_ = stoi(line);
+  } else if (count == 3) {
+    num_total_images_ = stoi(line);
+  } else if (count == 4) {
+    for (size_t i = 0; i < kNumOfClasses; i++) {
+      num_class_[i] = stoi(std::to_string(line.at(i)));
+    }
+  } else if (count >= 5 && count < (5 + kNumOfClasses)) {
+    std::stringstream line_stream(line);
+    std::string temp;
+    std::vector<std::vector<float>> prob_array(image_dimensions_, std::vector<float>(image_dimensions_));
+    for (size_t i = 0; i < num_elements_per_line; i++, line_stream >> temp) {
+      if (i % image_dimensions_ == 0) {
+        row++;
+        col = 0;
+      }
+      prob_array[row][col] = stof(temp);
+      col++;
+    }
+    probabilities_[count - 5] = prob_array;
+  } else {
+    //UPDATE 4D vector somehow lol
+    std::stringstream line_stream(line);
+    std::string temp;
+    for (size_t i = 0; i < 2 * num_elements_per_line; i++, line_stream >> temp) {
+      if (i % (2 * image_dimensions_) == 0) {
+        row++;
+        col = 0;
+      }  
+      
+      if (i % 2 == 0) {
+        raw_data_[row][col][count - kNumOfClasses - 5][0] = stoi(temp);
+      } else {
+        raw_data_[row][col][count - kNumOfClasses - 5][1] = stoi(temp);
+      }
+    }
+  }
+  count++;
+}
+
+std::vector<std::vector<std::vector<std::vector<size_t>>>> DataModel::GetRawData() const {
+  return raw_data_;
+}
+
+std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetProbabilities() const {
+  return probabilities_;
+}
+
+std::unordered_map<size_t, size_t> DataModel::GetNumClass() const {
+  return num_class_;
+}
+
+std::unordered_map<size_t, float> DataModel::GetPriors() const {
+  return priors_;
+}
+size_t DataModel::GetImageDimensions() const {
+  return image_dimensions_;
+}
+
+size_t DataModel::GetNumTotalImages() const {
+  return num_total_images_;
 }
 
 }  // namespace naivebayes

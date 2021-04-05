@@ -39,6 +39,9 @@ class DataModel {
    */
   void ProcessData(size_t& count, DataModel& data_model, std::string& line, size_t& type_class);
   
+  /** Load in a save file */
+  void LoadSave(size_t& count, DataModel& data_model, std::string& line);
+  
   /** Updates priors list */
   void UpdatePriors();
   
@@ -86,12 +89,15 @@ class DataModel {
   /** class -> probability for each pixel */
   std::unordered_map<size_t, std::vector<std::vector<float>>> probabilities_;
 
+  /** MODEL CONSTANTS */
   const size_t kLaplaceK = 1;
   const size_t kNumOfClasses = 10;
   const size_t kDefaultDimensions = 28;
-  const std::string kSaveTitle = "SAVE_FILE";
   const char kShadedOne = '#';
   const char kShadedTwo = '+';
+
+  /** SAVE FILE CONSTANTS */
+  const std::string kSaveTitle = "SAVE_FILE";
 };
 
 }  // namespace naivebayes
