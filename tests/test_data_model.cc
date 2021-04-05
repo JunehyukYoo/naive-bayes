@@ -32,12 +32,24 @@ TEST_CASE("Test variables for correct initialization before feeding the model da
   }
   
   SECTION("Probabilities test") {
-    for (const auto &element : model.GetShadedProbabilities()) {
-      for (size_t row = 0; row < 3; row++) {
-        for (size_t col = 0; col < 3; col++) {
-          REQUIRE(element.second[row][col] == 0.5);
+    SECTION("Unshaded") {
+      for (const auto &element : model.GetUnshadedProbabilities()) {
+        for (size_t row = 0; row < 3; row++) {
+          for (size_t col = 0; col < 3; col++) {
+            REQUIRE(element.second[row][col] == 0.5);
+          }
         }
-      }
+      }   
+    }
+    
+    SECTION("Shaded") {
+      for (const auto &element : model.GetShadedProbabilities()) {
+        for (size_t row = 0; row < 3; row++) {
+          for (size_t col = 0; col < 3; col++) {
+            REQUIRE(element.second[row][col] == 0.5);
+          }
+        }
+      }   
     }
   }
   
@@ -165,21 +177,7 @@ TEST_CASE("Test << operator from data, building model") {
   
   SECTION("Testing probabilities") {
     SECTION("Unshaded") {
-      for (const auto &element : model.GetUnshadedProbabilities()) {
-        for (size_t row = 0; row < 3; row++) {
-          for (size_t col = 0; col < 3; col++) {
-            if (element.first == 0) {
-              if (row == 1 & col == 1) {
-                REQUIRE(element.second[row][col] == Approx(0.333));
-              } else {
-                REQUIRE(element.second[row][col] == Approx(0.667)); 
-              }
-            } else {
-              REQUIRE(element.second[row][col] == 0.5);
-            }
-          }
-        }
-      }
+      
     }
     
     SECTION("Shaded") {

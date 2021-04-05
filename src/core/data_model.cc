@@ -114,6 +114,10 @@ std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
     }
     os << std::endl;
   }
+  
+  for (const auto &element : data_model.GetPriors()) {
+    os << std::to_string(element.second) << " ";
+  }
   return os;
 }
 
@@ -211,7 +215,7 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       col++;
       i++;
     }
-    data_model.unshaded_probabilities_[count - 5] = prob_array;
+    data_model.shaded_probabilities_[count - 5] = prob_array;
   } else if (count >= (5 + data_model.kNumOfClasses) && count < (5 + 2 * data_model.kNumOfClasses)) {
     std::stringstream line_stream(line);
     std::string temp;
@@ -226,8 +230,8 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       col++;
       i++;
     }
-    data_model.shaded_probabilities_[count - 5] = prob_array;
-  } else if (count >= (5 + 2 * data_model.kNumOfClasses)) {
+    data_model.unshaded_probabilities_[count - 5] = prob_array;
+  } else if (count >= (5 + 2 * data_model.kNumOfClasses) && count < (5 + 3 * data_model.kNumOfClasses)) {
     std::stringstream line_stream(line);
     std::string temp;
     size_t i = 0;
@@ -238,14 +242,22 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       }
 
       if (i % 2 == 0) {
-        data_model.raw_data_[row][col][count - data_model.kNumOfClasses - 5][0] = stoi(temp);
+        data_model.raw_data_[row][col][count - 2 * data_model.kNumOfClasses - 5][0] = stoi(temp);
       } else {
-        data_model.raw_data_[row][col][count - data_model.kNumOfClasses - 5][1] = stoi(temp);
+        data_model.raw_data_[row][col][count - 2 * data_model.kNumOfClasses - 5][1] = stoi(temp);
       }
       
       if (i % 2 != 0) {
         col++;
       }
+      i++;
+    }
+  } else if (count >= (5 + 3 * data_model.kNumOfClasses)) {
+    std::stringstream line_stream(line);
+    std::string temp;
+    size_t i = 0;
+    while (line_stream >> temp && i <= data_model.kNumOfClasses) {
+      data_model.priors_[i] = stof(temp);
       i++;
     }
   }
