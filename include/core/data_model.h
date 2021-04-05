@@ -37,7 +37,7 @@ class DataModel {
   /**
    * Process a line to load data from a text file.
    */
-  void ProcessLine();
+  void ProcessData(size_t& count, DataModel& data_model, std::string& line, size_t& type_class);
   
   /** Updates priors list */
   void UpdatePriors();
