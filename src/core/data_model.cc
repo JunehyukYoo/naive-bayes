@@ -18,7 +18,7 @@ DataModel::DataModel() {
     }
     probabilities_[i] = initial_vec_outer;
   }
-  std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2))));
+  std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(2))));
   raw_data_ = sized_array;
 }
 
@@ -105,6 +105,10 @@ size_t DataModel::GetNumClass(size_t class_) {
 
 std::vector<std::vector<std::vector<std::vector<size_t>>>> DataModel::GetRawData() const {
   return raw_data_;
+}
+
+std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetProbabilities() const {
+  return probabilities_;
 }
 
 

@@ -56,10 +56,13 @@ class DataModel {
   size_t GetImageDimensions() const;
   size_t GetNumTotalImages() const;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> GetRawData() const;
+  std::unordered_map<size_t, std::vector<std::vector<float>>> GetProbabilities() const;
 
  private:
   size_t image_dimensions_;
   size_t num_total_images_;
+  
+  /** class -> num of images of class */
   std::unordered_map<size_t, size_t> num_class_;
 
   /** row -> col -> class -> shaded/unshaded */
