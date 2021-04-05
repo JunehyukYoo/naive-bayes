@@ -32,7 +32,7 @@ TEST_CASE("Test variables for correct initialization before feeding the model da
   }
   
   SECTION("Probabilities test") {
-    for (const auto &element : model.GetProbabilities()) {
+    for (const auto &element : model.GetShadedProbabilities()) {
       for (size_t row = 0; row < 3; row++) {
         for (size_t col = 0; col < 3; col++) {
           REQUIRE(element.second[row][col] == 0.5);

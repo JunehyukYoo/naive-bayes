@@ -17,7 +17,7 @@ DataModel::DataModel() {
     for (size_t j = 0; j < image_dimensions_; j++) {
         initial_vec_outer.push_back(initial_vec_inner);
     }
-    probabilities_[i] = initial_vec_outer;
+      shaded_probabilities_[i] = initial_vec_outer;
   }
   num_total_images_ = 0;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(2))));
@@ -37,7 +37,7 @@ DataModel::DataModel(size_t image_dimensions) {
     for (size_t j = 0; j < image_dimensions_; j++) {
         initial_vec_outer.push_back(initial_vec_inner);
     }
-    probabilities_[i] = initial_vec_outer;
+      shaded_probabilities_[i] = initial_vec_outer;
   }
   num_total_images_ = 0;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2))));
@@ -84,7 +84,7 @@ std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
   }
   os << std::endl;
   
-  for (const auto &element : data_model.GetProbabilities()) {
+  for (const auto &element : data_model.GetShadedProbabilities()) {
     for (size_t row = 0; row < data_model.image_dimensions_; row++) {
       for (size_t col = 0; col < data_model.image_dimensions_; col++) {
         os << std::to_string(element.second[row][col]) << " ";
@@ -125,7 +125,7 @@ void DataModel::UpdatePriors() {
 }
 
 void DataModel::UpdateProbabilities() {
-  for (auto &element : probabilities_) {
+  for (auto &element : shaded_probabilities_) {
     for (size_t row = 0; row < image_dimensions_; row++) {
       for (size_t col = 0; col < image_dimensions_; col++) {
         auto numerator = static_cast<float>(kLaplaceK + raw_data_[row][col][element.first][1]);
@@ -198,7 +198,7 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       col++;
       i++;
     }
-    data_model.probabilities_[count - 5] = prob_array;
+    data_model.shaded_probabilities_[count - 5] = prob_array;
   } else if (count >= (5 + data_model.kNumOfClasses)) {
     std::stringstream line_stream(line);
     std::string temp;
@@ -228,8 +228,8 @@ std::vector<std::vector<std::vector<std::vector<size_t>>>> DataModel::GetRawData
   return raw_data_;
 }
 
-std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetProbabilities() const {
-  return probabilities_;
+std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetShadedProbabilities() const {
+  return shaded_probabilities_;
 }
 
 std::unordered_map<size_t, size_t> DataModel::GetNumClass() const {
