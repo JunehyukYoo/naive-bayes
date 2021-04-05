@@ -9,7 +9,7 @@ using namespace naivebayes;
 const std::string file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testtrainingimages.txt";
 const std::string error_message = "Could not open file.";
 
-TEST_CASE("Check that vectors and size_t counts update correctly with << operator") {
+TEST_CASE("Test << operator") {
   DataModel model(3);
   std::ifstream input_file(file_path);
   if (input_file.is_open()) {
