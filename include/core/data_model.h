@@ -50,11 +50,12 @@ class DataModel {
    * @param class_ The class type.
    * @return The number of images that fall under the class type.
    */
-  size_t GetNumClass(size_t class_);
+  size_t GetNumPerClass(size_t class_);
   
   /** Getters */
   size_t GetImageDimensions() const;
   size_t GetNumTotalImages() const;
+  std::unordered_map<size_t, size_t> GetNumClass() const;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> GetRawData() const;
   std::unordered_map<size_t, std::vector<std::vector<float>>> GetProbabilities() const;
 

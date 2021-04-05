@@ -14,7 +14,7 @@ TEST_CASE("Test variables for correct initialization before feeding the model da
   
   SECTION("Number of images per class test") {
     for (size_t i = 0; i < 10; i++) {
-      REQUIRE(model.GetNumClass(i) == 0);
+      REQUIRE(model.GetNumPerClass(i) == 0);
     }
   }
   
@@ -52,10 +52,10 @@ TEST_CASE("Test << operator, raw data (4 dimensional vector)") {
   
   REQUIRE(model.GetImageDimensions() == 3);
   //REQUIRE(model.GetNumTotalImages() == 4);
-  REQUIRE(model.GetNumClass(0) == 1);
-  REQUIRE(model.GetNumClass(1) == 2);
-  REQUIRE(model.GetNumClass(2) == 0);
-  REQUIRE(model.GetNumClass(3) == 1);
+  REQUIRE(model.GetNumPerClass(0) == 1);
+  REQUIRE(model.GetNumPerClass(1) == 2);
+  REQUIRE(model.GetNumPerClass(2) == 0);
+  REQUIRE(model.GetNumPerClass(3) == 1);
   
   SECTION("Testing class = 0, 4D vector, row -> col -> class -> shade") {
     SECTION("Shaded") {

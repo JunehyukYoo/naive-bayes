@@ -60,7 +60,7 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     }
     if (count == 1) {
       //check which class it is, update relevant variables
-      line.erase(line.find_last_not_of(" \n\r\t") + 1);
+      //line.erase(line.find_last_not_of(" \n\r\t") + 1);
       type_class = stoi(line);
       data_model.num_total_images_++;
       data_model.IncrementNumClassMap(type_class);
@@ -80,8 +80,27 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
 }
 
 std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
-  //comment for indent
-  
+  os << std::to_string(data_model.image_dimensions_) << std::endl;
+  os << std::to_string(data_model.num_total_images_) << std::endl;
+  for (const auto &element : data_model.GetNumClass()) {
+    os << std::to_string(element.second) << std::endl;
+  }
+  for (const auto &element : data_model.GetProbabilities()) {
+    for (size_t row = 0; row < data_model.image_dimensions_; row++) {
+      for (size_t col = 0; col < data_model.image_dimensions_; col++) {
+        os << std::to_string(element.second[row][col]) << std::endl;
+      }
+    }
+  }
+  for (size_t row = 0; row < 3; row++) {
+    for (size_t col = 0; col < 3; col++) {
+      for (size_t class_ = 0; class_ < 10; class_++) {
+        for (size_t shade = 0; shade < 2; shade++) {
+          os << std::to_string(data_model.GetRawData()[row][col][class_][shade]) << std::endl;
+        }
+      }
+    }
+  }
   return os;
 }
 
@@ -93,7 +112,7 @@ size_t DataModel::GetNumTotalImages() const {
   return num_total_images_;
 }
 
-size_t DataModel::GetNumClass(size_t class_) {
+size_t DataModel::GetNumPerClass(size_t class_) {
   std::unordered_map<size_t, size_t>::iterator itr;
   for (itr = num_class_.begin(); itr != num_class_.end(); itr++) {
     if (itr->first == class_) {
@@ -109,6 +128,10 @@ std::vector<std::vector<std::vector<std::vector<size_t>>>> DataModel::GetRawData
 
 std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetProbabilities() const {
   return probabilities_;
+}
+
+std::unordered_map<size_t, size_t> DataModel::GetNumClass() const {
+  return num_class_;
 }
 
 
