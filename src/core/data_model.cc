@@ -70,6 +70,7 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     }
   }
   data_model.UpdatePriors();
+  data_model.UpdateProbabilities();
   return is;
 }
 
@@ -123,6 +124,18 @@ void DataModel::UpdatePriors() {
   }
 }
 
+void DataModel::UpdateProbabilities() {
+  for (auto &element : probabilities_) {
+    for (size_t row = 0; row < image_dimensions_; row++) {
+      for (size_t col = 0; col < image_dimensions_; col++) {
+        auto numerator = static_cast<float>(kLaplaceK + raw_data_[row][col][element.first][1]);
+        auto denominator = static_cast<float>(2 * kLaplaceK + GetNumPerClass(element.first));
+        element.second[row][col] = numerator / denominator;
+      }
+    }
+  }
+}
+
 float DataModel::GetPriorFromClass(size_t class_) const {
   for (const auto &element : priors_) {
     if (element.first == class_) {
@@ -139,7 +152,6 @@ void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &l
   }
   if (count == 1) {
     //check which class it is, update relevant variables
-    //line.erase(line.find_last_not_of(" \n\r\t") + 1);
     type_class = stoi(line);
     data_model.num_total_images_++;
     data_model.IncrementNumClassMap(type_class);
@@ -188,7 +200,6 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
     }
     data_model.probabilities_[count - 5] = prob_array;
   } else if (count >= (5 + data_model.kNumOfClasses)) {
-    //UPDATE 4D vector somehow lol
     std::stringstream line_stream(line);
     std::string temp;
     size_t i = 0;

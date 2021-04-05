@@ -45,6 +45,9 @@ class DataModel {
   /** Updates priors list */
   void UpdatePriors();
   
+  /** Updates probabilities map */
+  void UpdateProbabilities();
+  
   /**
    * Increments num_class_ unordered map.
    * @param class_ The class of image who's count is being incremented.
