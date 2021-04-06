@@ -68,15 +68,16 @@ TEST_CASE("Test << operator from data, building model") {
   } else {
       std::cerr << error_message << std::endl;
   }
-  
-  REQUIRE(model.GetImageDimensions() == 3);
-  REQUIRE(model.GetNumTotalImages() == 4);
-  REQUIRE(model.GetNumPerClass(0) == 1);
-  REQUIRE(model.GetNumPerClass(1) == 2);
-  REQUIRE(model.GetNumPerClass(2) == 0);
-  REQUIRE(model.GetNumPerClass(3) == 1);
-  for (size_t i = 4; i < 10; i++) {
-    REQUIRE(model.GetNumPerClass(i) == 0);
+  SECTION("Testing number images per class and size_t variables") {
+    REQUIRE(model.GetImageDimensions() == 3);
+    REQUIRE(model.GetNumTotalImages() == 4);
+    REQUIRE(model.GetNumPerClass(0) == 1);
+    REQUIRE(model.GetNumPerClass(1) == 2);
+    REQUIRE(model.GetNumPerClass(2) == 0);
+    REQUIRE(model.GetNumPerClass(3) == 1);
+    for (size_t i = 4; i < 10; i++) {
+      REQUIRE(model.GetNumPerClass(i) == 0);
+    } 
   }
   
   SECTION("Testing class = 0, 4D vector, row -> col -> class -> shade") {
@@ -194,11 +195,42 @@ TEST_CASE("Test << operator from data, building model") {
       while (count < 10) {
         for (size_t row = 0; row < 3; row++) {
           for (size_t col = 0; col < 3; col++) {
-            REQUIRE(model.GetUnshadedProbabilities().at(count)[row][col] == Approx(0.5));
-            REQUIRE(model.GetUnshadedProbabilities().at(2)[row][col] == Approx(0.5));
+            REQUIRE(model.GetShadedProbabilities().at(count)[row][col] == Approx(0.5));
+            REQUIRE(model.GetShadedProbabilities().at(2)[row][col] == Approx(0.5));
           }
         }
         count++;
+      }
+
+      //testing class=0
+      for (size_t row = 0; row < 3; row++) {
+        for (size_t col = 0; col < 3; col++) {
+          if (row == 1 && col == 1) {
+            REQUIRE(model.GetShadedProbabilities().at(0)[row][col] == Approx(0.333).margin(0.001));
+          } else {
+            REQUIRE(model.GetShadedProbabilities().at(0)[row][col] == Approx(0.666).margin(0.001));
+          }
+        }
+      }
+      //testing class=1
+      REQUIRE(model.GetShadedProbabilities().at(1)[0][0] == Approx(0.500).margin(0.001));
+      REQUIRE(model.GetShadedProbabilities().at(1)[0][1] == Approx(0.750).margin(0.001));
+      REQUIRE(model.GetShadedProbabilities().at(1)[0][2] == Approx(0.250).margin(0.001));
+      REQUIRE(model.GetShadedProbabilities().at(1)[1][0] == Approx(0.250).margin(0.001));
+      REQUIRE(model.GetShadedProbabilities().at(1)[1][1] == Approx(0.750).margin(0.001));
+      REQUIRE(model.GetShadedProbabilities().at(1)[1][2] == Approx(0.250).margin(0.001));
+      REQUIRE(model.GetShadedProbabilities().at(1)[2][0] == Approx(0.500).margin(0.001));
+      REQUIRE(model.GetShadedProbabilities().at(1)[2][1] == Approx(0.750).margin(0.001));
+      REQUIRE(model.GetShadedProbabilities().at(1)[2][2] == Approx(0.500).margin(0.001));
+      //testing class=3
+      for (size_t row = 0; row < 3; row++) {
+        for (size_t col = 0; col < 3; col++) {
+          if (row == 1 && col == 0) {
+            REQUIRE(model.GetShadedProbabilities().at(3)[row][col] == Approx(0.333).margin(0.001));
+          } else {
+            REQUIRE(model.GetShadedProbabilities().at(3)[row][col] == Approx(0.666).margin(0.001));
+          }
+        }
       }
     }
   }
@@ -212,12 +244,17 @@ TEST_CASE("Test << operator from save file") {
   } else {
     std::cerr << error_message << std::endl;
   }
-  REQUIRE(model1.GetImageDimensions() == 3);
-  REQUIRE(model1.GetNumTotalImages() == 4);
-  REQUIRE(model1.GetNumPerClass(0) == 1);
-  REQUIRE(model1.GetNumPerClass(1) == 2);
-  REQUIRE(model1.GetNumPerClass(2) == 0);
-  REQUIRE(model1.GetNumPerClass(3) == 1);
+  SECTION("Testing number images per class and size_t variables") {
+    REQUIRE(model1.GetImageDimensions() == 3);
+    REQUIRE(model1.GetNumTotalImages() == 4);
+    REQUIRE(model1.GetNumPerClass(0) == 1);
+    REQUIRE(model1.GetNumPerClass(1) == 2);
+    REQUIRE(model1.GetNumPerClass(2) == 0);
+    REQUIRE(model1.GetNumPerClass(3) == 1);
+    for (size_t i = 4; i < 10; i++) {
+      REQUIRE(model1.GetNumPerClass(i) == 0);
+    }
+  }
 
   SECTION("Testing class = 0, 4D vector, row -> col -> class -> shade") {
     SECTION("Shaded") {
@@ -334,11 +371,41 @@ TEST_CASE("Test << operator from save file") {
       while (count < 10) {
         for (size_t row = 0; row < 3; row++) {
           for (size_t col = 0; col < 3; col++) {
-            REQUIRE(model1.GetUnshadedProbabilities().at(count)[row][col] == Approx(0.5));
-            REQUIRE(model1.GetUnshadedProbabilities().at(2)[row][col] == Approx(0.5));
+            REQUIRE(model1.GetShadedProbabilities().at(count)[row][col] == Approx(0.5));
+            REQUIRE(model1.GetShadedProbabilities().at(2)[row][col] == Approx(0.5));
           }
         }
         count++;
+      }
+      //testing class=0
+      for (size_t row = 0; row < 3; row++) {
+        for (size_t col = 0; col < 3; col++) {
+          if (row == 1 && col == 1) {
+            REQUIRE(model1.GetShadedProbabilities().at(0)[row][col] == Approx(0.333).margin(0.001));
+          } else {
+            REQUIRE(model1.GetShadedProbabilities().at(0)[row][col] == Approx(0.666).margin(0.001));
+          }
+        }
+      }
+      //testing class=1
+      REQUIRE(model1.GetShadedProbabilities().at(1)[0][0] == Approx(0.500).margin(0.001));
+      REQUIRE(model1.GetShadedProbabilities().at(1)[0][1] == Approx(0.750).margin(0.001));
+      REQUIRE(model1.GetShadedProbabilities().at(1)[0][2] == Approx(0.250).margin(0.001));
+      REQUIRE(model1.GetShadedProbabilities().at(1)[1][0] == Approx(0.250).margin(0.001));
+      REQUIRE(model1.GetShadedProbabilities().at(1)[1][1] == Approx(0.750).margin(0.001));
+      REQUIRE(model1.GetShadedProbabilities().at(1)[1][2] == Approx(0.250).margin(0.001));
+      REQUIRE(model1.GetShadedProbabilities().at(1)[2][0] == Approx(0.500).margin(0.001));
+      REQUIRE(model1.GetShadedProbabilities().at(1)[2][1] == Approx(0.750).margin(0.001));
+      REQUIRE(model1.GetShadedProbabilities().at(1)[2][2] == Approx(0.500).margin(0.001));
+      //testing class=3
+      for (size_t row = 0; row < 3; row++) {
+        for (size_t col = 0; col < 3; col++) {
+          if (row == 1 && col == 0) {
+            REQUIRE(model1.GetShadedProbabilities().at(3)[row][col] == Approx(0.333).margin(0.001));
+          } else {
+            REQUIRE(model1.GetShadedProbabilities().at(3)[row][col] == Approx(0.666).margin(0.001));
+          }
+        }
       }
     }
   }
