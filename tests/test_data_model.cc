@@ -177,11 +177,29 @@ TEST_CASE("Test << operator from data, building model") {
   
   SECTION("Testing probabilities") {
     SECTION("Unshaded") {
-      
+      size_t count = 4;
+      while (count < 10) {
+        for (size_t row = 0; row < 3; row++) {
+          for (size_t col = 0; col < 3; col++) {
+            REQUIRE(model.GetUnshadedProbabilities().at(count)[row][col] == Approx(0.5));
+            REQUIRE(model.GetUnshadedProbabilities().at(2)[row][col] == Approx(0.5));
+          }
+        }
+        count++;
+      }
     }
     
     SECTION("Shaded") {
-      REQUIRE(1 < 2);
+      size_t count = 4;
+      while (count < 10) {
+        for (size_t row = 0; row < 3; row++) {
+          for (size_t col = 0; col < 3; col++) {
+            REQUIRE(model.GetUnshadedProbabilities().at(count)[row][col] == Approx(0.5));
+            REQUIRE(model.GetUnshadedProbabilities().at(2)[row][col] == Approx(0.5));
+          }
+        }
+        count++;
+      }
     }
   }
 }
@@ -295,5 +313,33 @@ TEST_CASE("Test << operator from save file") {
     REQUIRE(model1.GetPriorFromClass(1) == Approx(0.214).margin(0.001));
     REQUIRE(model1.GetPriorFromClass(2) == Approx(0.071).margin(0.001));
     REQUIRE(model1.GetPriorFromClass(3) == Approx(0.143).margin(0.001));
+  }
+
+  SECTION("Testing probabilities") {
+    SECTION("Unshaded") {
+      size_t count = 4;
+      while (count < 10) {
+        for (size_t row = 0; row < 3; row++) {
+          for (size_t col = 0; col < 3; col++) {
+            REQUIRE(model1.GetUnshadedProbabilities().at(count)[row][col] == Approx(0.5));
+            REQUIRE(model1.GetUnshadedProbabilities().at(2)[row][col] == Approx(0.5));
+          }
+        }
+        count++;
+      }
+    }
+
+    SECTION("Shaded") {
+      size_t count = 4;
+      while (count < 10) {
+        for (size_t row = 0; row < 3; row++) {
+          for (size_t col = 0; col < 3; col++) {
+            REQUIRE(model1.GetUnshadedProbabilities().at(count)[row][col] == Approx(0.5));
+            REQUIRE(model1.GetUnshadedProbabilities().at(2)[row][col] == Approx(0.5));
+          }
+        }
+        count++;
+      }
+    }
   }
 }
