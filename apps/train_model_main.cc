@@ -7,6 +7,7 @@ int main() {
   std::string file_path_test = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testtrainingimages.txt";
   std::string file_path_full = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/trainingimagesandlabels.txt";
   std::string file_path_save = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/savefile.txt";
+  std::string file_path_empty = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptysavefile.txt";
   naivebayes::DataModel model(3);
   naivebayes::DataModel model1(3);
   
@@ -15,7 +16,7 @@ int main() {
   if (input_file.is_open()) {
     input_file >> model;
   } else {
-    std::cerr << "error_message" << std::endl;
+    std::cerr << "error message" << std::endl;
   }
   
   //<< operator, save file
@@ -30,6 +31,17 @@ int main() {
   std::ifstream input_file_1(file_path_save);
   if (input_file_1.is_open()) {
     input_file_1 >> model1;
+  } else {
+    std::cerr << "error message" << std::endl;
+  }
+  
+  std::ifstream input_file_2(file_path_empty);
+  if (input_file_2.is_open()) {
+    try {
+      input_file_2 >> model1;
+    } catch (...) {
+      
+    }
   } else {
     std::cerr << "error message" << std::endl;
   }

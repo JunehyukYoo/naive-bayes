@@ -8,6 +8,7 @@ using namespace naivebayes;
 
 const std::string file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testtrainingimages.txt";
 const std::string save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/savefile.txt";
+const std::string bad_save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptysavefile.txt";
 const std::string error_message = "Could not open file.";
 
 TEST_CASE("Test variables for correct initialization before feeding the model data") {
@@ -470,5 +471,15 @@ TEST_CASE("Test << operator from save file") {
         }
       }
     }
+  }
+}
+
+TEST_CASE("Empty file") {
+  DataModel model(3);
+  std::ifstream input_file(bad_save_file_path);
+  if (input_file.is_open()) {
+    REQUIRE_THROWS_AS(input_file >> model, std::invalid_argument);
+  } else {
+    std::cerr << error_message << std::endl;
   }
 }

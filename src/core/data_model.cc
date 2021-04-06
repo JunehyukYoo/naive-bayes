@@ -1,6 +1,7 @@
 #include <core/data_model.h>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 namespace naivebayes {
 DataModel::DataModel() {
@@ -59,8 +60,16 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
   std::string line;
   size_t count = 1;
   size_t type_class;
+
+  std::ofstream output_file(data_model.kBackupSaveFilePath);
+  if (output_file.is_open()) {
+    output_file << data_model;
+  } else {
+    std::cerr << "Backup file cannot be opened." << std::endl;
+  }
+  
   while (std::getline(is, line)) {
-    if (line == data_model.kSaveTitle) {
+    if (line == data_model.kSaveTitle && count == 1) {
       is_save_file = true;
     }
     
@@ -71,6 +80,15 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     } else {
       data_model.LoadSave(count, data_model, line);
     }
+  }
+  if (is_save_file && count < 5 + 3 * data_model.kNumOfClasses) {
+      std::ifstream backup_file(data_model.kBackupSaveFilePath);
+      if (backup_file.is_open()) {
+          backup_file >> data_model;
+      } else {
+          std::cerr << "Backup file cannot be opened." << std::endl;
+      }
+    throw std::invalid_argument("Bad save file");
   }
   return is;
 }
