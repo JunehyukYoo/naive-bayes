@@ -3,7 +3,6 @@
 #include <core/data_model.h>
 #include <fstream>
 
-// TODO: You may want to change main's signature to take in argc and argv
 int main() {
   std::string file_path_test = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testtrainingimages.txt";
   std::string file_path_full = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/trainingimagesandlabels.txt";

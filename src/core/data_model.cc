@@ -1,6 +1,5 @@
 #include <core/data_model.h>
 #include <iostream>
-#include <fstream>
 #include <sstream>
 
 namespace naivebayes {
@@ -144,9 +143,16 @@ void DataModel::UpdateProbabilities() {
     for (size_t row = 0; row < image_dimensions_; row++) {
       for (size_t col = 0; col < image_dimensions_; col++) {
         auto numerator_shaded = static_cast<float>(kLaplaceK + raw_data_[row][col][element.first][1]);
-        auto numerator_unshaded = static_cast<float>(kLaplaceK + raw_data_[row][col][element.first][0]);
         auto denominator = static_cast<float>(2 * kLaplaceK + GetNumPerClass(element.first));
         element.second[row][col] = numerator_shaded / denominator;
+      }
+    }
+  }
+  for (auto &element : unshaded_probabilities_) {
+    for (size_t row = 0; row < image_dimensions_; row++) {
+      for (size_t col = 0; col < image_dimensions_; col++) {
+        auto numerator_unshaded = static_cast<float>(kLaplaceK + raw_data_[row][col][element.first][0]);
+        auto denominator = static_cast<float>(2 * kLaplaceK + GetNumPerClass(element.first));
         element.second[row][col] = numerator_unshaded / denominator;
       }
     }
