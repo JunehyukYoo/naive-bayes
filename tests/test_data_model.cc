@@ -364,6 +364,38 @@ TEST_CASE("Test << operator from save file") {
         }
         count++;
       }
+      
+      //testing class=0
+      for (size_t row = 0; row < 3; row++) {
+        for (size_t col = 0; col < 3; col++) {
+          if (row == 1 && col == 1) {
+            REQUIRE(model1.GetUnshadedProbabilities().at(0)[row][col] == Approx(0.666).margin(0.001));
+          } else {
+            REQUIRE(model1.GetUnshadedProbabilities().at(0)[row][col] == Approx(0.333).margin(0.001));
+          }
+        }
+      }
+      //testing class=1
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[0][0] == Approx(0.500).margin(0.001));
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[0][1] == Approx(0.250).margin(0.001));
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[0][2] == Approx(0.750).margin(0.001));
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[1][0] == Approx(0.750).margin(0.001));
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[1][1] == Approx(0.250).margin(0.001));
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[1][2] == Approx(0.750).margin(0.001));
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[2][0] == Approx(0.500).margin(0.001));
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[2][1] == Approx(0.250).margin(0.001));
+      REQUIRE(model1.GetUnshadedProbabilities().at(1)[2][2] == Approx(0.500).margin(0.001));
+      //testing class=3
+      for (size_t row = 0; row < 3; row++) {
+          for (size_t col = 0; col < 3; col++) {
+              if (row == 1 && col == 0) {
+                  REQUIRE(model1.GetUnshadedProbabilities().at(3)[row][col] == Approx(0.666).margin(0.001));
+              } else {
+                  REQUIRE(model1.GetUnshadedProbabilities().at(3)[row][col] == Approx(0.333).margin(0.001));
+              }
+          }
+      }
+       
     }
 
     SECTION("Shaded") {
