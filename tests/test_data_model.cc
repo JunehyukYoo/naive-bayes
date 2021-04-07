@@ -486,7 +486,7 @@ TEST_CASE("Testing << operator") {
   }
 }
 
-TEST_CASE("Try to read bad save file") {
+TEST_CASE("Try to read empty save file") {
   DataModel model(3);
   std::ifstream input_file(empty_save_file_path);
   if (input_file.is_open()) {
@@ -496,7 +496,12 @@ TEST_CASE("Try to read bad save file") {
   }
 }
 
-TEST_CASE("Try to read bad training file") {
+TEST_CASE("Try to read empty training file") {
   DataModel model(3);
   std::ifstream input_file(empty_training_file);
+  if (input_file.is_open()) {
+    REQUIRE_THROWS_AS(input_file >> model, std::invalid_argument);
+  } else {
+    std::cerr << error_message << std::endl;
+  }
 }

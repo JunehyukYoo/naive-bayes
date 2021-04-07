@@ -227,7 +227,11 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
     std::string temp;
     size_t class_ = 0;
     while (line_stream >> temp && class_ <= data_model.kNumOfClasses) {
-      data_model.num_class_[class_] = stoi(temp);
+      try {
+        data_model.num_class_[class_] = stoi(temp);
+      } catch (...) {
+        throw std::invalid_argument("Broken Save File");
+      }
       class_++;
     }
   } else if (count >= 5 && count < (5 + data_model.kNumOfClasses)) {
@@ -240,7 +244,11 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
           row++;
           col = 0;
       }
-      prob_array[row][col] = stof(temp);
+      try {
+        prob_array[row][col] = stof(temp);
+      } catch (...) {
+        throw std::invalid_argument("Broken Save File");
+      }
       col++;
       i++;
     }
@@ -255,7 +263,11 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
         row++;
         col = 0;
       }
-      prob_array[row][col] = stof(temp);
+      try {
+        prob_array[row][col] = stof(temp);
+      } catch (...) {
+        throw std::invalid_argument("Broken Save File");
+      }
       col++;
       i++;
     }
@@ -271,9 +283,17 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       }
 
       if (i % 2 == 0) {
-        data_model.raw_data_[row][col][count - 2 * data_model.kNumOfClasses - 5][0] = stoi(temp);
+        try {
+          data_model.raw_data_[row][col][count - 2 * data_model.kNumOfClasses - 5][0] = stoi(temp);
+        } catch (...) {
+          throw std::invalid_argument("Broken Save File");
+        }
       } else {
-        data_model.raw_data_[row][col][count - 2 * data_model.kNumOfClasses - 5][1] = stoi(temp);
+        try {
+          data_model.raw_data_[row][col][count - 2 * data_model.kNumOfClasses - 5][1] = stoi(temp);
+        } catch (...) {
+          throw std::invalid_argument("Broken Save File");
+        }
       }
       
       if (i % 2 != 0) {
@@ -286,7 +306,11 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
     std::string temp;
     size_t i = 0;
     while (line_stream >> temp && i <= data_model.kNumOfClasses) {
-      data_model.priors_[i] = stof(temp);
+      try {
+        data_model.priors_[i] = stof(temp);
+      } catch (...) {
+        throw std::invalid_argument("Broken Save File");
+      }
       i++;
     }
   }
