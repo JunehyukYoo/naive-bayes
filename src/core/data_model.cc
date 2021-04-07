@@ -81,6 +81,7 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
       data_model.LoadSave(count, data_model, line);
     }
   }
+  
   if (is_save_file && count < 5 + 3 * data_model.kNumOfClasses) {
       std::ifstream backup_file(data_model.kBackupSaveFilePath);
       if (backup_file.is_open()) {
@@ -193,7 +194,11 @@ void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &l
   }
   if (count == 1) {
     //check which class it is, update relevant variables
-    type_class = stoi(line);
+    try {
+      type_class = stoi(line);
+    } catch (...) {
+      throw std::invalid_argument("Broken Training File");
+    }
     data_model.num_total_images_++;
     data_model.IncrementNumClassMap(type_class);
   } else {

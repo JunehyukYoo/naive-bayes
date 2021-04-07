@@ -6,10 +6,11 @@
 
 using namespace naivebayes;
 
-const std::string file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testtrainingimages.txt";
+const std::string testing_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testtrainingimages.txt";
 const std::string save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/savefile.txt";
-const std::string bad_save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptysavefile.txt";
+const std::string empty_save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptysavefile.txt";
 const std::string testing_save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testingsavefile.txt";
+const std::string empty_training_file = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptytrainingimages.txt";
 const std::string error_message = "Could not open file.";
 
 TEST_CASE("Test variables for correct initialization before feeding the model data") {
@@ -64,7 +65,7 @@ TEST_CASE("Test variables for correct initialization before feeding the model da
 
 TEST_CASE("Test >> operator from data, building model") {
   DataModel model(3);
-  std::ifstream input_file(file_path);
+  std::ifstream input_file(testing_file_path);
   if (input_file.is_open()) {
       input_file >> model;
   } else {
@@ -487,10 +488,15 @@ TEST_CASE("Testing << operator") {
 
 TEST_CASE("Try to read bad save file") {
   DataModel model(3);
-  std::ifstream input_file(bad_save_file_path);
+  std::ifstream input_file(empty_save_file_path);
   if (input_file.is_open()) {
     REQUIRE_THROWS_AS(input_file >> model, std::invalid_argument);
   } else {
     std::cerr << error_message << std::endl;
   }
+}
+
+TEST_CASE("Try to read bad training file") {
+  DataModel model(3);
+  std::ifstream input_file(empty_training_file);
 }
