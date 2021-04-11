@@ -70,7 +70,7 @@ class DataModel {
    */
   float GetPriorFromClass(size_t class_) const;
   
-  void TestModelAccuracy(std::ifstream test_file);
+  void TestModelAccuracy(std::string test_file_path);
   
   /** Getters */
   size_t GetImageDimensions() const;
@@ -80,6 +80,7 @@ class DataModel {
   std::unordered_map<size_t, std::vector<std::vector<float>>> GetShadedProbabilities() const;
   std::unordered_map<size_t, std::vector<std::vector<float>>> GetUnshadedProbabilities() const;
   std::unordered_map<size_t, float> GetPriors() const;
+  float GetModelAccuracy() const;
 
  private:
   size_t image_dimensions_;

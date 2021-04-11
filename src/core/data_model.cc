@@ -191,13 +191,7 @@ float DataModel::GetPriorFromClass(size_t class_) const {
 
 void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &line, size_t &type_class, bool is_test, size_t &testing_total, size_t &testing_right) {
   size_t one_image_line_req = data_model.image_dimensions_ + 1;
-  std::unordered_map<size_t, float> likelihood_scores;
-  
-  if (is_test) {
-    for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
-      likelihood_scores[i] = 0;
-    }
-  }
+  std::vector<float> likelihood_scores(data_model.kNumOfClasses);
   
   if (count > one_image_line_req) {
     count = 1;
@@ -385,11 +379,12 @@ void DataModel::LoadProbabilities(size_t &count, DataModel &data_model, std::str
   }
 }
 
-void DataModel::TestModelAccuracy(std::ifstream test_file) {
+void DataModel::TestModelAccuracy(std::string test_file_path) {
+  std::ifstream test_file(test_file_path);
   if (test_file.is_open()) {
     std::string line;
     size_t type_class;
-    size_t count = 0;
+    size_t count = 1;
     size_t num_total = 0;
     size_t num_right = 0;
     DataModel temp = *this;
@@ -400,6 +395,10 @@ void DataModel::TestModelAccuracy(std::ifstream test_file) {
   } else {
     throw std::invalid_argument("Invalid testing images and labels file.");
   }
+}
+
+float DataModel::GetModelAccuracy() const {
+  return model_accuracy_;
 }
 
 }  // namespace naivebayes
