@@ -218,7 +218,7 @@ void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &l
       if (line.at(col) == data_model.kShadedOne || line.at(col) == data_model.kShadedTwo) {
         if (is_test) {
           for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
-            likelihood_scores[i] *= log(data_model.GetShadedProbabilities().at(i)[count - 2][col]);
+            likelihood_scores[i] += log(data_model.GetShadedProbabilities().at(i)[count - 2][col]);
           }
         } else {
           data_model.raw_data_[count - 2][col][type_class][1]++; 
@@ -226,7 +226,7 @@ void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &l
       } else {
         if (is_test) {
           for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
-            likelihood_scores[i] *= log(data_model.GetUnshadedProbabilities().at(i)[count - 2][col]);
+            likelihood_scores[i] += log(data_model.GetUnshadedProbabilities().at(i)[count - 2][col]);
           }
         } else {
           data_model.raw_data_[count - 2][col][type_class][0]++; 
@@ -235,8 +235,8 @@ void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &l
     }
   }
   
-  if (is_test) {
-    float greatest = 0;
+  if (is_test && count == one_image_line_req) {
+    float greatest = -std::numeric_limits<float>::max();
     size_t class_;
     for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
       if (likelihood_scores[i] > greatest) {
