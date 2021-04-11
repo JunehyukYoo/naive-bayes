@@ -37,7 +37,7 @@ class DataModel {
   /**
    * Process a line to load data from a text file.
    */
-  void ProcessData(size_t& count, DataModel& data_model, std::string& line, size_t& type_class);
+  void ProcessData(size_t& count, DataModel& data_model, std::string& line, size_t& type_class, bool is_test, size_t& testing_total, size_t& testing_right);
   
   /** Load in a save file */
   void LoadSave(size_t& count, DataModel& data_model, std::string& line);
@@ -70,6 +70,8 @@ class DataModel {
    */
   float GetPriorFromClass(size_t class_) const;
   
+  void TestModelAccuracy(std::ifstream test_file);
+  
   /** Getters */
   size_t GetImageDimensions() const;
   size_t GetNumTotalImages() const;
@@ -82,7 +84,7 @@ class DataModel {
  private:
   size_t image_dimensions_;
   size_t num_total_images_;
-  //float model_accuracy_;
+  float model_accuracy_ = 0;
   
   /** class -> num of images of class */
   std::unordered_map<size_t, size_t> num_class_;

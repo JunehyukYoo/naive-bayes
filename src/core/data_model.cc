@@ -60,6 +60,8 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
   std::string line;
   size_t count = 1;
   size_t type_class;
+  size_t unused_total = 0;
+  size_t unused_right = 0;
 
   std::ofstream output_file(data_model.kBackupSaveFilePath);
   if (output_file.is_open()) {
@@ -74,7 +76,7 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     }
     
     if (!is_save_file) {
-      data_model.ProcessData(count, data_model, line, type_class);
+      data_model.ProcessData(count, data_model, line, type_class, false, unused_total, unused_right);
       data_model.UpdatePriors();
       data_model.UpdateProbabilities();
     } else {
@@ -187,8 +189,16 @@ float DataModel::GetPriorFromClass(size_t class_) const {
   return -1;
 }
 
-void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &line, size_t &type_class) {
+void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &line, size_t &type_class, bool is_test, size_t &testing_total, size_t &testing_right) {
   size_t one_image_line_req = data_model.image_dimensions_ + 1;
+  std::unordered_map<size_t, float> likelihood_scores;
+  
+  if (is_test) {
+    for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+      likelihood_scores[i] = 0;
+    }
+  }
+  
   if (count > one_image_line_req) {
     count = 1;
   }
@@ -199,16 +209,49 @@ void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &l
     } catch (...) {
       throw std::invalid_argument("Broken Training File");
     }
-    data_model.num_total_images_++;
-    data_model.IncrementNumClassMap(type_class);
+    if (is_test) {
+      for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+        likelihood_scores[i] = log(data_model.GetPriorFromClass(i));
+      }
+      testing_total++;
+    } else {
+      data_model.num_total_images_++;
+      data_model.IncrementNumClassMap(type_class);
+    }
   } else {
     //method to update the raw_data array, pass the (count-2) as the row and the charAt index is the col of the image
     for (size_t col = 0; col < data_model.image_dimensions_; col++) {
       if (line.at(col) == data_model.kShadedOne || line.at(col) == data_model.kShadedTwo) {
-        data_model.raw_data_[count - 2][col][type_class][1]++;
+        if (is_test) {
+          for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+            likelihood_scores[i] *= log(data_model.GetShadedProbabilities().at(i)[count - 2][col]);
+          }
+        } else {
+          data_model.raw_data_[count - 2][col][type_class][1]++; 
+        }
       } else {
-        data_model.raw_data_[count - 2][col][type_class][0]++;
+        if (is_test) {
+          for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+            likelihood_scores[i] *= log(data_model.GetUnshadedProbabilities().at(i)[count - 2][col]);
+          }
+        } else {
+          data_model.raw_data_[count - 2][col][type_class][0]++; 
+        }
       }
+    }
+  }
+  
+  if (is_test) {
+    float greatest = 0;
+    size_t class_;
+    for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+      if (likelihood_scores[i] > greatest) {
+        greatest = likelihood_scores[i];
+        class_ = i;
+      }
+    }
+    if (class_ == type_class) {
+      testing_right++;
     }
   }
   count++;
@@ -223,6 +266,7 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
   } else if (count == 3) {
     data_model.num_total_images_ = stoi(line);
   } else if (count == 4) {
+    //update count of images per class
     std::stringstream line_stream(line);
     std::string temp;
     size_t class_ = 0;
@@ -235,10 +279,13 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       class_++;
     }
   } else if (count >= 5 && count < (5 + data_model.kNumOfClasses)) {
+    //update shaded probabilities map
     data_model.LoadProbabilities(count, data_model, line, true);
   } else if (count >= (5 + data_model.kNumOfClasses) && count < (5 + 2 * data_model.kNumOfClasses)) {
+    //update unshaded probabilities map
     data_model.LoadProbabilities(count, data_model, line, false);
   } else if (count >= (5 + 2 * data_model.kNumOfClasses) && count < (5 + 3 * data_model.kNumOfClasses)) {
+    //update raw data 4D vector
     std::stringstream line_stream(line);
     std::string temp;
     size_t i = 0;
@@ -268,6 +315,7 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       i++;
     }
   } else if (count >= (5 + 3 * data_model.kNumOfClasses)) {
+    //update priors map
     std::stringstream line_stream(line);
     std::string temp;
     size_t i = 0;
@@ -334,6 +382,23 @@ void DataModel::LoadProbabilities(size_t &count, DataModel &data_model, std::str
     data_model.shaded_probabilities_[count - 5] = prob_array;
   } else {
     data_model.unshaded_probabilities_[count - (5 + data_model.kNumOfClasses)] = prob_array; 
+  }
+}
+
+void DataModel::TestModelAccuracy(std::ifstream test_file) {
+  if (test_file.is_open()) {
+    std::string line;
+    size_t type_class;
+    size_t count = 0;
+    size_t num_total = 0;
+    size_t num_right = 0;
+    DataModel temp = *this;
+    while (getline(test_file, line)) {
+      ProcessData(count, temp, line, type_class, true, num_total, num_right); 
+    }
+    model_accuracy_ = static_cast<float>(num_right/num_total);
+  } else {
+    throw std::invalid_argument("Invalid testing images and labels file.");
   }
 }
 
