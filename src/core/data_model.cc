@@ -235,43 +235,9 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       class_++;
     }
   } else if (count >= 5 && count < (5 + data_model.kNumOfClasses)) {
-    std::stringstream line_stream(line);
-    std::string temp;
-    std::vector<std::vector<float>> prob_array(data_model.image_dimensions_, std::vector<float>(data_model.image_dimensions_));
-    size_t i = 0;
-    while (line_stream >> temp && i <= data_model.kDefaultDimensions) {
-      if (i % data_model.image_dimensions_ == 0 && i != 0) {
-          row++;
-          col = 0;
-      }
-      try {
-        prob_array[row][col] = stof(temp);
-      } catch (...) {
-        throw std::invalid_argument("Broken Save File");
-      }
-      col++;
-      i++;
-    }
-    data_model.shaded_probabilities_[count - 5] = prob_array;
+    data_model.LoadProbabilities(count, data_model, line, true);
   } else if (count >= (5 + data_model.kNumOfClasses) && count < (5 + 2 * data_model.kNumOfClasses)) {
-    std::stringstream line_stream(line);
-    std::string temp;
-    std::vector<std::vector<float>> prob_array(data_model.image_dimensions_, std::vector<float>(data_model.image_dimensions_));
-    size_t i = 0;
-    while (line_stream >> temp && i <= data_model.kDefaultDimensions) {
-      if (i % data_model.image_dimensions_ == 0 && i != 0) {
-        row++;
-        col = 0;
-      }
-      try {
-        prob_array[row][col] = stof(temp);
-      } catch (...) {
-        throw std::invalid_argument("Broken Save File");
-      }
-      col++;
-      i++;
-    }
-    data_model.unshaded_probabilities_[count - (5 + data_model.kNumOfClasses)] = prob_array;
+    data_model.LoadProbabilities(count, data_model, line, false);
   } else if (count >= (5 + 2 * data_model.kNumOfClasses) && count < (5 + 3 * data_model.kNumOfClasses)) {
     std::stringstream line_stream(line);
     std::string temp;
@@ -342,6 +308,33 @@ size_t DataModel::GetNumTotalImages() const {
 
 std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetUnshadedProbabilities() const {
   return unshaded_probabilities_;
+}
+
+void DataModel::LoadProbabilities(size_t &count, DataModel &data_model, std::string &line, bool shaded) {
+  size_t row = 0;
+  size_t col = 0;
+  std::stringstream line_stream(line);
+  std::string temp;
+  std::vector<std::vector<float>> prob_array(data_model.image_dimensions_, std::vector<float>(data_model.image_dimensions_));
+  size_t i = 0;
+  while (line_stream >> temp && i <= data_model.kDefaultDimensions) {
+    if (i % data_model.image_dimensions_ == 0 && i != 0) {
+      row++;
+      col = 0;
+    }
+    try {
+      prob_array[row][col] = stof(temp);
+    } catch (...) {
+      throw std::invalid_argument("Broken Save File");
+    }
+    col++;
+    i++;
+  }
+  if (shaded) {
+    data_model.shaded_probabilities_[count - 5] = prob_array;
+  } else {
+    data_model.unshaded_probabilities_[count - (5 + data_model.kNumOfClasses)] = prob_array; 
+  }
 }
 
 }  // namespace naivebayes

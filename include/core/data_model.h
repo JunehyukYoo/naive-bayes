@@ -48,6 +48,8 @@ class DataModel {
   /** Updates probabilities map */
   void UpdateProbabilities();
   
+  void LoadProbabilities(size_t &count, DataModel &data_model, std::string &line, bool shaded);
+  
   /**
    * Increments num_class_ unordered map.
    * @param class_ The class of image who's count is being incremented.
@@ -80,6 +82,7 @@ class DataModel {
  private:
   size_t image_dimensions_;
   size_t num_total_images_;
+  //float model_accuracy_;
   
   /** class -> num of images of class */
   std::unordered_map<size_t, size_t> num_class_;
