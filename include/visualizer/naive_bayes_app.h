@@ -4,6 +4,7 @@
 #include "cinder/app/RendererGl.h"
 #include "cinder/gl/gl.h"
 #include "sketchpad.h"
+#include "core/data_model.h"
 
 namespace naivebayes {
 
@@ -25,10 +26,11 @@ class NaiveBayesApp : public ci::app::App {
   const double kWindowSize = 875;
   const double kMargin = 100;
   const size_t kImageDimension = 28;
+  const std::string kImageFilePath = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/trainingimagesandlabels.txt";
 
  private:
   Sketchpad sketchpad_;
-  naivebayes::DataModel data_model_;
+  DataModel data_model_;
   int current_prediction_ = -1;
 };
 

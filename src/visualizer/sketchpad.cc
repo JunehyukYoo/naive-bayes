@@ -14,6 +14,7 @@ Sketchpad::Sketchpad(const vec2& top_left_corner, size_t num_pixels_per_side,
       brush_radius_(brush_radius) {
     std::vector<std::vector<bool>> new_board(num_pixels_per_side, std::vector<bool>(num_pixels_per_side));
     sketchpad_shaded_ = new_board;
+    new_board.clear();
 }
 
 void Sketchpad::Draw() const {
@@ -67,6 +68,11 @@ void Sketchpad::Clear() {
     }
   }
 }
+
+std::vector<std::vector<bool>> Sketchpad::GetSketchPad() const {
+  return sketchpad_shaded_;
+}
+
 
 }  // namespace visualizer
 

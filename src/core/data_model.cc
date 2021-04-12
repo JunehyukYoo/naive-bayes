@@ -23,6 +23,7 @@ DataModel::DataModel() {
   num_total_images_ = 0;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(kShadingOptions))));
   raw_data_ = sized_array;
+  sized_array.clear();
 }
 
 DataModel::DataModel(size_t image_dimensions) {
@@ -44,6 +45,7 @@ DataModel::DataModel(size_t image_dimensions) {
   num_total_images_ = 0;
   std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(kShadingOptions))));
   raw_data_ = sized_array;
+  sized_array.clear();
 }
 
 void DataModel::IncrementNumClassMap(size_t class_) {
@@ -403,10 +405,14 @@ float DataModel::GetModelAccuracy() const {
   return model_accuracy_;
 }
 
-size_t DataModel::ClassifyImage(std::vector<std::vector<bool>> image) {
+int DataModel::ClassifyImage(std::vector<std::vector<bool>> image) {
   std::vector<float> likelihood_scores;
   for (size_t i = 0; i < kNumOfClasses; i++) {
-    likelihood_scores.push_back(log(GetPriorFromClass(i)));
+    if (GetPriorFromClass(i) == 0) {
+      likelihood_scores.push_back(0);
+    } else {
+      likelihood_scores.push_back(log(GetPriorFromClass(i)));
+    }
   }
   
   for (size_t row = 0; row < image.size(); row++) {
@@ -421,8 +427,8 @@ size_t DataModel::ClassifyImage(std::vector<std::vector<bool>> image) {
     }
   }
   
-  size_t classification;
-  size_t greatest_prob = -std::numeric_limits<float>::max();
+  int classification = -10;
+  float greatest_prob = -std::numeric_limits<float>::max();
   for (size_t i = 0; i < likelihood_scores.size(); i++) {
     if (likelihood_scores.at(i) > greatest_prob) {
       greatest_prob = likelihood_scores.at(i);

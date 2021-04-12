@@ -101,7 +101,7 @@ class DataModel {
    * @param image The 2D vector corresponding to an image.
    * @return The model's prediction.
    */
-  size_t ClassifyImage(std::vector<std::vector<bool>> image);
+  int ClassifyImage(std::vector<std::vector<bool>> image);
   
   /** Getters */
   size_t GetImageDimensions() const;
