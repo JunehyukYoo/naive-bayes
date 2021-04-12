@@ -62,6 +62,7 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
   size_t type_class;
   size_t unused_total = 0;
   size_t unused_right = 0;
+  std::vector<float> unused_vec;
 
   std::ofstream output_file(data_model.kBackupSaveFilePath);
   if (output_file.is_open()) {
@@ -76,7 +77,7 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     }
     
     if (!is_save_file) {
-      data_model.ProcessData(count, data_model, line, type_class, false, unused_total, unused_right);
+      data_model.ProcessData(count, data_model, line, type_class, false, unused_total, unused_right, unused_vec);
       data_model.UpdatePriors();
       data_model.UpdateProbabilities();
     } else {
@@ -189,9 +190,8 @@ float DataModel::GetPriorFromClass(size_t class_) const {
   return -1;
 }
 
-void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &line, size_t &type_class, bool is_test, size_t &testing_total, size_t &testing_right) {
+void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &line, size_t &type_class, bool is_test, size_t &testing_total, size_t &testing_right, std::vector<float> &likelihood_scores) {
   size_t one_image_line_req = data_model.image_dimensions_ + 1;
-  std::vector<float> likelihood_scores(data_model.kNumOfClasses);
   
   if (count > one_image_line_req) {
     count = 1;
@@ -387,11 +387,13 @@ void DataModel::TestModelAccuracy(std::string test_file_path) {
     size_t count = 1;
     size_t num_total = 0;
     size_t num_right = 0;
+    std::vector<float> likelihood_scores(kNumOfClasses);
     DataModel temp = *this;
     while (getline(test_file, line)) {
-      ProcessData(count, temp, line, type_class, true, num_total, num_right); 
+      ProcessData(count, temp, line, type_class, true, num_total, num_right, likelihood_scores); 
     }
-    model_accuracy_ = static_cast<float>(num_right/num_total);
+    this->model_accuracy_ = static_cast<float>(num_right/(num_total));
+    std::cout << "The model accuracy is: " + std::to_string(model_accuracy_) << std::endl;
   } else {
     throw std::invalid_argument("Invalid testing images and labels file.");
   }

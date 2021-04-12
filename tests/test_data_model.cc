@@ -11,7 +11,7 @@ const std::string save_file_path = "/Users/s200808/Documents/Cinder/my-projects/
 const std::string empty_save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptysavefile.txt";
 const std::string testing_save_file_path = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testingsavefile.txt";
 const std::string empty_training_file = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptytrainingimages.txt";
-const std::string small_set_test_model_file = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/smallsettrainingimages.txt";
+const std::string small_set_test_model_file = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/smallsettesttrainingimages.txt";
 const std::string error_message = "Could not open file.";
 
 TEST_CASE("Test variables for correct initialization before feeding the model data") {
@@ -730,6 +730,7 @@ TEST_CASE("Try to read empty training file") {
 
 TEST_CASE("Test accuracy") {
   DataModel model(3);
+  //small set file path
   std::ifstream input_file(small_set_file_path);
   if (input_file.is_open()) {
     input_file >> model;
@@ -737,6 +738,7 @@ TEST_CASE("Test accuracy") {
     std::cerr << error_message << std::endl;
   }
   REQUIRE(model.GetModelAccuracy() == 0);
+  //small_set_test_model_file
   model.TestModelAccuracy(small_set_test_model_file);
-  REQUIRE(model.GetModelAccuracy() > 0);
+  REQUIRE(model.GetModelAccuracy() > 0.5);
 }

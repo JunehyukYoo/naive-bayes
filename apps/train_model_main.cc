@@ -9,8 +9,13 @@ int main() {
   std::string file_path_save = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/savefile.txt";
   std::string file_path_empty = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptysavefile.txt";
   std::string file_path_empty_training_model = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/emptytrainingimages.txt";
+  std::string file_path_full_testing = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/testimagesandlabels.txt";
+  
   naivebayes::DataModel model(3);
   naivebayes::DataModel model1(3);
+  naivebayes::DataModel model_final;
+  
+  /*
   
   //>> operator, build model
   std::ifstream input_file(file_path_test);
@@ -37,6 +42,19 @@ int main() {
   } else {
     std::cerr << "error message" << std::endl;
   }
+   */
+  
+  //28 image size, testing accuracy
+  std::ifstream input_file_large(file_path_full);
+  if (input_file_large.is_open()) {
+    input_file_large >> model_final;
+  } else {
+    std::cerr << "error message" << std::endl;
+  }
+  std::cout << model_final.GetModelAccuracy() << std::endl;
+  model_final.TestModelAccuracy(file_path_full_testing);
+  std::cout << model_final.GetModelAccuracy() << std::endl;
+  
   
   //empty
   std::ifstream input_file_2(file_path_empty);
