@@ -21,7 +21,7 @@ DataModel::DataModel() {
     unshaded_probabilities_[i] = initial_vec_outer;
   }
   num_total_images_ = 0;
-  std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(2))));
+  std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(kShadingOptions))));
   raw_data_ = sized_array;
 }
 
@@ -42,7 +42,7 @@ DataModel::DataModel(size_t image_dimensions) {
     unshaded_probabilities_[i] = initial_vec_outer;
   }
   num_total_images_ = 0;
-  std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(10, std::vector<size_t>(2))));
+  std::vector<std::vector<std::vector<std::vector<size_t>>>> sized_array(image_dimensions_,std::vector<std::vector<std::vector<size_t>>>(image_dimensions_, std::vector<std::vector<size_t>>(kNumOfClasses, std::vector<size_t>(kShadingOptions))));
   raw_data_ = sized_array;
 }
 
@@ -272,13 +272,13 @@ void DataModel::LoadSave(size_t &count, DataModel &data_model, std::string &line
       }
       class_++;
     }
-  } else if (count >= 5 && count < (5 + data_model.kNumOfClasses)) {
+  } else if (count >= kNumOfLinesInSaveFileBeforeAnyVec && count < (kNumOfLinesInSaveFileBeforeAnyVec + data_model.kNumOfClasses)) {
     //update shaded probabilities map
     data_model.LoadProbabilities(count, data_model, line, true);
-  } else if (count >= (5 + data_model.kNumOfClasses) && count < (5 + 2 * data_model.kNumOfClasses)) {
+  } else if (count >= (kNumOfLinesInSaveFileBeforeAnyVec + data_model.kNumOfClasses) && count < (kNumOfLinesInSaveFileBeforeAnyVec + 2 * data_model.kNumOfClasses)) {
     //update unshaded probabilities map
     data_model.LoadProbabilities(count, data_model, line, false);
-  } else if (count >= (5 + 2 * data_model.kNumOfClasses) && count < (5 + 3 * data_model.kNumOfClasses)) {
+  } else if (count >= (kNumOfLinesInSaveFileBeforeAnyVec + 2 * data_model.kNumOfClasses) && count < (kNumOfLinesInSaveFileBeforeAnyVec + 3 * data_model.kNumOfClasses)) {
     //update raw data 4D vector
     std::stringstream line_stream(line);
     std::string temp;

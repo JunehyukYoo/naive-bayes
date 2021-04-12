@@ -35,11 +35,24 @@ class DataModel {
   friend std::ostream& operator<<(std::ostream& os, DataModel& data_model);
   
   /**
-   * Process a line to load data from a text file.
+   * Processes data from a training images data set or a data set to test model accuracy.
+   * @param count A size_t variable used within logic to decode data sets.
+   * @param data_model The data model being read/altered.
+   * @param line The line that is passed form the data set.
+   * @param type_class The type of class the current image in the data set is.
+   * @param is_test Boolean to show if the data set is for model testing or not.
+   * @param testing_total A size_t variable that states the total amount of images in the data set. ONLY FOR MODEL TESTING.
+   * @param testing_right A size_t variable that states the correct amount of images the model predicts. ONLY FOR MODEL TESTING.
+   * @param likelihood_scores A vector of likelihood scores for the particular image being any class. ONLY FOR MODEL TESTING.
    */
   void ProcessData(size_t& count, DataModel& data_model, std::string& line, size_t& type_class, bool is_test, size_t& testing_total, size_t& testing_right, std::vector<float>& likelihood_scores);
   
-  /** Load in a save file */
+  /**
+   * Loads in a save file to read.
+   * @param count A size_t variable used within logic to decode the save file.
+   * @param data_model The data model being altered.
+   * @param line The line that is passed form the save file.
+   */
   void LoadSave(size_t& count, DataModel& data_model, std::string& line);
   
   /** Updates priors list */
@@ -48,7 +61,13 @@ class DataModel {
   /** Updates probabilities map */
   void UpdateProbabilities();
   
-  /** Load in probabilities from save file */
+  /**
+   * Helper method used in LoadSave() in order to load in probability maps from the save file.
+   * @param count A size_t variable used within logic to decode the save file.
+   * @param data_model The data model being altered.
+   * @param line The line that is passed form the save file.
+   * @param shaded A boolean to show whether we are reading the shaded or unshaded probabilities map.
+   */
   void LoadProbabilities(size_t &count, DataModel &data_model, std::string &line, bool shaded);
   
   /**
@@ -71,6 +90,10 @@ class DataModel {
    */
   float GetPriorFromClass(size_t class_) const;
   
+  /**
+   * Method to test model accuracy (updates the model_accuracy_ variable)
+   * @param test_file_path A string with the path to the testing data set.
+   */
   void TestModelAccuracy(std::string test_file_path);
   
   /** Getters */
@@ -107,6 +130,8 @@ class DataModel {
   const size_t kLaplaceK = 1;
   const size_t kNumOfClasses = 10;
   const size_t kDefaultDimensions = 28;
+  const size_t kShadingOptions = 2;
+  const size_t kNumOfLinesInSaveFileBeforeAnyVec = 5;
   const char kShadedOne = '#';
   const char kShadedTwo = '+';
 
