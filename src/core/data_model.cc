@@ -403,4 +403,33 @@ float DataModel::GetModelAccuracy() const {
   return model_accuracy_;
 }
 
+size_t DataModel::ClassifyImage(std::vector<std::vector<bool>> image) {
+  std::vector<float> likelihood_scores;
+  for (size_t i = 0; i < kNumOfClasses; i++) {
+    likelihood_scores.push_back(log(GetPriorFromClass(i)));
+  }
+  
+  for (size_t row = 0; row < image.size(); row++) {
+    for (size_t col = 0; col < image.at(0).size(); col++) {
+      for (size_t i = 0; i < kNumOfClasses; i++) {
+        if (image.at(row).at(col)) {
+          likelihood_scores.at(i) += log(shaded_probabilities_.at(i).at(row).at(col));
+        } else {
+          likelihood_scores.at(i) += log(unshaded_probabilities_.at(i).at(row).at(col));
+        }
+      }
+    }
+  }
+  
+  size_t classification;
+  size_t greatest_prob = -std::numeric_limits<float>::max();
+  for (size_t i = 0; i < likelihood_scores.size(); i++) {
+    if (likelihood_scores.at(i) > greatest_prob) {
+      greatest_prob = likelihood_scores.at(i);
+      classification = i;
+    }
+  }
+  return classification;
+}
+
 }  // namespace naivebayes

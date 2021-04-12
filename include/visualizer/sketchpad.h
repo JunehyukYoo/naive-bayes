@@ -49,6 +49,12 @@ class Sketchpad {
    */
   void Clear();
 
+  /**
+   * Gets the current 2D sketchpad vector.
+   * @return sketchpad_shaded_ 2D vector
+   */
+  std::vector<std::vector<bool>> GetSketchPad() const;
+
  private:
   glm::vec2 top_left_corner_;
 

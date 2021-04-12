@@ -28,6 +28,7 @@ class NaiveBayesApp : public ci::app::App {
 
  private:
   Sketchpad sketchpad_;
+  naivebayes::DataModel data_model_;
   int current_prediction_ = -1;
 };
 

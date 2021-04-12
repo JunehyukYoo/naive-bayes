@@ -96,6 +96,13 @@ class DataModel {
    */
   void TestModelAccuracy(std::string test_file_path);
   
+  /**
+   * Classifies the image drawn in on the sketchpad.
+   * @param image The 2D vector corresponding to an image.
+   * @return The model's prediction.
+   */
+  size_t ClassifyImage(std::vector<std::vector<bool>> image);
+  
   /** Getters */
   size_t GetImageDimensions() const;
   size_t GetNumTotalImages() const;
