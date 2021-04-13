@@ -1,4 +1,5 @@
 #include <visualizer/naive_bayes_app.h>
+#include <core/classifier.h>
 
 namespace naivebayes {
 
@@ -48,7 +49,8 @@ void NaiveBayesApp::keyDown(ci::app::KeyEvent event) {
       if (IsEmpty(sketchpad_)) {
         current_prediction_ = -1;
       } else {
-        current_prediction_ = data_model_.ClassifyImage(sketchpad_.GetSketchPad()); 
+        //current_prediction_ = data_model_.ClassifyImage(sketchpad_.GetSketchPad()); 
+        current_prediction_ = Classifier::ClassifyImage(sketchpad_, data_model_);
       }
       break;
 

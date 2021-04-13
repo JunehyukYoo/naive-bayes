@@ -1,8 +1,9 @@
 #include <catch2/catch.hpp>
 
-#include <core/data_model.h>
+#include <core/classifier.h>
 #include <fstream>
 #include <iostream>
+#include <core/data_model.h>
 
 using namespace naivebayes;
 
@@ -737,6 +738,6 @@ TEST_CASE("Sanity Check: Test accuracy") {
     std::cerr << error_message << std::endl;
   }
   REQUIRE(model.GetModelAccuracy() == 0);
-  model.TestModelAccuracy(small_set_test_model_file);
+  model.CalculateModelAccuracy(small_set_test_model_file);
   REQUIRE(model.GetModelAccuracy() >= 0.7);
 }

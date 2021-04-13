@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -90,27 +91,7 @@ class DataModel {
    * Method to test model accuracy (updates the model_accuracy_ variable)
    * @param test_file_path A string with the path to the testing data set.
    */
-  void TestModelAccuracy(const std::string& test_file_path);
-  
-  /**
-   * Calculate the accuracy of the model by taking in a testing images file.
-   * @param count A size_t variable used within logic to decode data sets.
-   * @param data_model The data model being read/altered.
-   * @param line The line that is passed form the data set.
-   * @param type_class The type of class the current image in the data set is.
-   * @param testing_total The total amount of images in the file.
-   * @param testing_right The total amount of images the model guessed right.
-   * @param likelihood_scores The likelihood scores holding probabilities for being each class for each image
-   */
-  void CalculateAccuracy(size_t& count, DataModel& data_model, const std::string& line, size_t& type_class, 
-                         size_t& testing_total, size_t& testing_right, std::vector<float>& likelihood_scores);
-  
-  /**
-   * Classifies the image drawn in on the sketchpad.
-   * @param image The 2D vector corresponding to an image.
-   * @return The model's prediction.
-   */
-  int ClassifyImage(const std::vector<std::vector<bool>>& image);
+  void CalculateModelAccuracy(const std::string& test_file_path);
   
   /** Getters */
   size_t GetImageDimensions() const;
@@ -121,6 +102,7 @@ class DataModel {
   std::unordered_map<size_t, std::vector<std::vector<float>>> GetUnshadedProbabilities() const;
   std::unordered_map<size_t, float> GetPriors() const;
   float GetModelAccuracy() const;
+  size_t GetNumOfClasses() const;
 
  private:
   size_t image_dimensions_;
