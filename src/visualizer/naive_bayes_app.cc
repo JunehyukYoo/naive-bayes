@@ -9,13 +9,14 @@ NaiveBayesApp::NaiveBayesApp()
                  kWindowSize - 2 * kMargin) {
   ci::app::setWindowSize((int) kWindowSize, (int) kWindowSize);
   std::ifstream input_file(kImageFilePath);
+  
   /*
   if (input_file.is_open()) {
     input_file >> data_model_;
   } else {
     std::cerr << "error message" << std::endl;
   }
-   */
+  */
 }
 
 void NaiveBayesApp::draw() {
@@ -46,13 +47,28 @@ void NaiveBayesApp::keyDown(ci::app::KeyEvent event) {
     case ci::app::KeyEvent::KEY_RETURN:
       // ask your classifier to classify the image that's currently drawn on the
       // sketchpad and update current_prediction_
-      current_prediction_ = data_model_.ClassifyImage(sketchpad_.GetSketchPad());
+      if (IsEmpty(sketchpad_)) {
+        current_prediction_ = -1;
+      } else {
+        current_prediction_ = data_model_.ClassifyImage(sketchpad_.GetSketchPad()); 
+      }
       break;
 
     case ci::app::KeyEvent::KEY_DELETE:
       sketchpad_.Clear();
       break;
   }
+}
+
+bool NaiveBayesApp::IsEmpty(Sketchpad sketchpad) const {
+  for (size_t row = 0; row < sketchpad.GetSketchPad().size(); row++) {
+    for (size_t col = 0; col < sketchpad.GetSketchPad().size(); col++) {
+      if (sketchpad.GetSketchPad().at(row).at(col)) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 }  // namespace visualizer
