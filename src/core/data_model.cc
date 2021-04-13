@@ -77,11 +77,14 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     
     if (!is_save_file) {
       data_model.ProcessData(count, data_model, line, type_class);
-      data_model.UpdatePriors();
-      data_model.UpdateProbabilities();
     } else {
       data_model.LoadSave(count, data_model, line);
     }
+  }
+  
+  if (!is_save_file) {
+    data_model.UpdatePriors();
+    data_model.UpdateProbabilities();
   }
   
   if (is_save_file && count < 5 + 3 * data_model.kNumOfClasses) {

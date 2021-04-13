@@ -10,13 +10,11 @@ NaiveBayesApp::NaiveBayesApp()
   ci::app::setWindowSize((int) kWindowSize, (int) kWindowSize);
   std::ifstream input_file(kImageFilePath);
   
-  /*
   if (input_file.is_open()) {
     input_file >> data_model_;
   } else {
     std::cerr << "error message" << std::endl;
   }
-  */
 }
 
 void NaiveBayesApp::draw() {
