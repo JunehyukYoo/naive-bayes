@@ -728,9 +728,8 @@ TEST_CASE("Try to read empty training file") {
   }
 }
 
-TEST_CASE("Test accuracy") {
+TEST_CASE("Sanity Check: Test accuracy") {
   DataModel model(3);
-  //small set file path
   std::ifstream input_file(small_set_file_path);
   if (input_file.is_open()) {
     input_file >> model;
@@ -738,7 +737,6 @@ TEST_CASE("Test accuracy") {
     std::cerr << error_message << std::endl;
   }
   REQUIRE(model.GetModelAccuracy() == 0);
-  //small_set_test_model_file
   model.TestModelAccuracy(small_set_test_model_file);
-  REQUIRE(model.GetModelAccuracy() > 0.5);
+  REQUIRE(model.GetModelAccuracy() >= 0.7);
 }
