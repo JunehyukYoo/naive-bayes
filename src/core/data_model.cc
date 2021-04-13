@@ -48,7 +48,7 @@ DataModel::DataModel(size_t image_dimensions) {
   sized_array.clear();
 }
 
-void DataModel::IncrementNumClassMap(size_t class_) {
+void DataModel::IncrementNumClassMap(const size_t& class_) {
   std::unordered_map<size_t, size_t>::iterator itr;
   for (itr = num_class_.begin(); itr != num_class_.end(); itr++) {
     if (itr->first == class_) {
@@ -62,9 +62,6 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
   std::string line;
   size_t count = 1;
   size_t type_class;
-  size_t unused_total = 0;
-  size_t unused_right = 0;
-  std::vector<float> unused_vec;
 
   std::ofstream output_file(data_model.kBackupSaveFilePath);
   if (output_file.is_open()) {
@@ -79,7 +76,7 @@ std::istream &operator>>(std::istream &is, DataModel &data_model) {
     }
     
     if (!is_save_file) {
-      data_model.ProcessData(count, data_model, line, type_class, false, unused_total, unused_right, unused_vec);
+      data_model.ProcessData(count, data_model, line, type_class);
       data_model.UpdatePriors();
       data_model.UpdateProbabilities();
     } else {
@@ -144,7 +141,7 @@ std::ostream& operator<<(std::ostream& os, DataModel& data_model) {
   return os;
 }
 
-size_t DataModel::GetNumPerClass(size_t class_) const {
+size_t DataModel::GetNumPerClass(const size_t& class_) const {
   std::unordered_map<size_t, size_t>::const_iterator itr;
   for (itr = num_class_.begin(); itr != num_class_.end(); itr++) {
     if (itr->first == class_) {
@@ -183,7 +180,7 @@ void DataModel::UpdateProbabilities() {
   }
 }
 
-float DataModel::GetPriorFromClass(size_t class_) const {
+float DataModel::GetPriorFromClass(const size_t& class_) const {
   for (const auto &element : priors_) {
     if (element.first == class_) {
       return element.second;
@@ -192,9 +189,8 @@ float DataModel::GetPriorFromClass(size_t class_) const {
   return -1;
 }
 
-void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &line, size_t &type_class, bool is_test, size_t &testing_total, size_t &testing_right, std::vector<float> &likelihood_scores) {
+void DataModel::ProcessData(size_t &count, DataModel &data_model, const std::string &line, size_t &type_class) {
   size_t one_image_line_req = data_model.image_dimensions_ + 1;
-  
   if (count > one_image_line_req) {
     count = 1;
   }
@@ -205,49 +201,16 @@ void DataModel::ProcessData(size_t &count, DataModel &data_model, std::string &l
     } catch (...) {
       throw std::invalid_argument("Broken Training File");
     }
-    if (is_test) {
-      for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
-        likelihood_scores[i] = log(data_model.GetPriorFromClass(i));
-      }
-      testing_total++;
-    } else {
-      data_model.num_total_images_++;
-      data_model.IncrementNumClassMap(type_class);
-    }
+    data_model.num_total_images_++;
+    data_model.IncrementNumClassMap(type_class);
   } else {
     //method to update the raw_data array, pass the (count-2) as the row and the charAt index is the col of the image
     for (size_t col = 0; col < data_model.image_dimensions_; col++) {
       if (line.at(col) == data_model.kShadedOne || line.at(col) == data_model.kShadedTwo) {
-        if (is_test) {
-          for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
-            likelihood_scores[i] += log(data_model.GetShadedProbabilities().at(i)[count - 2][col]);
-          }
-        } else {
-          data_model.raw_data_[count - 2][col][type_class][1]++; 
-        }
+        data_model.raw_data_[count - 2][col][type_class][1]++;
       } else {
-        if (is_test) {
-          for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
-            likelihood_scores[i] += log(data_model.GetUnshadedProbabilities().at(i)[count - 2][col]);
-          }
-        } else {
-          data_model.raw_data_[count - 2][col][type_class][0]++; 
-        }
+        data_model.raw_data_[count - 2][col][type_class][0]++;
       }
-    }
-  }
-  
-  if (is_test && count == one_image_line_req) {
-    float greatest = -std::numeric_limits<float>::max();
-    size_t class_;
-    for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
-      if (likelihood_scores[i] > greatest) {
-        greatest = likelihood_scores[i];
-        class_ = i;
-      }
-    }
-    if (class_ == type_class) {
-      testing_right++;
     }
   }
   count++;
@@ -354,7 +317,7 @@ std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetUnshad
   return unshaded_probabilities_;
 }
 
-void DataModel::LoadProbabilities(size_t &count, DataModel &data_model, std::string &line, bool shaded) {
+void DataModel::LoadProbabilities(size_t &count, DataModel &data_model, const std::string &line, bool shaded) {
   size_t row = 0;
   size_t col = 0;
   std::stringstream line_stream(line);
@@ -381,7 +344,7 @@ void DataModel::LoadProbabilities(size_t &count, DataModel &data_model, std::str
   }
 }
 
-void DataModel::TestModelAccuracy(std::string test_file_path) {
+void DataModel::TestModelAccuracy(const std::string& test_file_path) {
   std::ifstream test_file(test_file_path);
   if (test_file.is_open()) {
     std::string line;
@@ -392,7 +355,7 @@ void DataModel::TestModelAccuracy(std::string test_file_path) {
     std::vector<float> likelihood_scores(kNumOfClasses);
     DataModel temp = *this;
     while (getline(test_file, line)) {
-      ProcessData(count, temp, line, type_class, true, num_total, num_right, likelihood_scores); 
+      CalculateAccuracy(count, temp, line, type_class, num_total, num_right, likelihood_scores); 
     }
     this->model_accuracy_ = static_cast<float>(num_right/(num_total));
     std::cout << "The model accuracy is: " + std::to_string(model_accuracy_) << std::endl;
@@ -405,7 +368,7 @@ float DataModel::GetModelAccuracy() const {
   return model_accuracy_;
 }
 
-int DataModel::ClassifyImage(std::vector<std::vector<bool>> image) {
+int DataModel::ClassifyImage(const std::vector<std::vector<bool>> &image) {
   std::vector<float> likelihood_scores;
   for (size_t i = 0; i < kNumOfClasses; i++) {
     if (GetPriorFromClass(i) == 0) {
@@ -436,6 +399,54 @@ int DataModel::ClassifyImage(std::vector<std::vector<bool>> image) {
     }
   }
   return classification;
+}
+
+void DataModel::CalculateAccuracy(size_t &count, DataModel &data_model, const std::string &line, size_t &type_class,
+                                  size_t &testing_total, size_t &testing_right,
+                                  std::vector<float> &likelihood_scores) {
+  size_t one_image_line_req = data_model.image_dimensions_ + 1;
+
+  if (count > one_image_line_req) {
+    count = 1;
+  }
+  if (count == 1) {
+    try {
+      type_class = stoi(line);
+    } catch (...) {
+      throw std::invalid_argument("Broken Training File");
+    }
+    for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+      likelihood_scores[i] = log(data_model.GetPriorFromClass(i));
+    }
+    testing_total++;
+  } else {
+    for (size_t col = 0; col < data_model.image_dimensions_; col++) {
+      if (line.at(col) == data_model.kShadedOne || line.at(col) == data_model.kShadedTwo) {
+        for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+          likelihood_scores[i] += log(data_model.GetShadedProbabilities().at(i)[count - 2][col]);
+        }
+      } else {
+        for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+          likelihood_scores[i] += log(data_model.GetUnshadedProbabilities().at(i)[count - 2][col]);
+        }
+      }
+    }
+  }
+
+  if (count == one_image_line_req) {
+    float greatest = -std::numeric_limits<float>::max();
+    size_t class_;
+    for (size_t i = 0; i < data_model.kNumOfClasses; i++) {
+      if (likelihood_scores[i] > greatest) {
+        greatest = likelihood_scores[i];
+        class_ = i;
+      }
+    }
+    if (class_ == type_class) {
+      testing_right++;
+    }
+  }
+  count++;
 }
 
 }  // namespace naivebayes

@@ -40,12 +40,8 @@ class DataModel {
    * @param data_model The data model being read/altered.
    * @param line The line that is passed form the data set.
    * @param type_class The type of class the current image in the data set is.
-   * @param is_test Boolean to show if the data set is for model testing or not.
-   * @param testing_total A size_t variable that states the total amount of images in the data set. ONLY FOR MODEL TESTING.
-   * @param testing_right A size_t variable that states the correct amount of images the model predicts. ONLY FOR MODEL TESTING.
-   * @param likelihood_scores A vector of likelihood scores for the particular image being any class. ONLY FOR MODEL TESTING.
    */
-  void ProcessData(size_t& count, DataModel& data_model, std::string& line, size_t& type_class, bool is_test, size_t& testing_total, size_t& testing_right, std::vector<float>& likelihood_scores);
+  void ProcessData(size_t& count, DataModel& data_model, const std::string& line, size_t& type_class);
   
   /**
    * Loads in a save file to read.
@@ -68,40 +64,53 @@ class DataModel {
    * @param line The line that is passed form the save file.
    * @param shaded A boolean to show whether we are reading the shaded or unshaded probabilities map.
    */
-  void LoadProbabilities(size_t &count, DataModel &data_model, std::string &line, bool shaded);
+  void LoadProbabilities(size_t &count, DataModel &data_model, const std::string &line, const bool shaded);
   
   /**
    * Increments num_class_ unordered map.
    * @param class_ The class of image who's count is being incremented.
    */
-  void IncrementNumClassMap(size_t class_);
+  void IncrementNumClassMap(const size_t& class_);
 
   /**
    * Returns the number of a certain class type within the data set.
    * @param class_ The class type.
    * @return The number of images that fall under the class type.
    */
-  size_t GetNumPerClass(size_t class_) const;
+  size_t GetNumPerClass(const size_t& class_) const;
   
   /**
    * Returns the prior value of a certain class type.
    * @param class_ The class type.
    * @return The prior of the class type.
    */
-  float GetPriorFromClass(size_t class_) const;
+  float GetPriorFromClass(const size_t& class_) const;
   
   /**
    * Method to test model accuracy (updates the model_accuracy_ variable)
    * @param test_file_path A string with the path to the testing data set.
    */
-  void TestModelAccuracy(std::string test_file_path);
+  void TestModelAccuracy(const std::string& test_file_path);
+  
+  /**
+   * Calculate the accuracy of the model by taking in a testing images file.
+   * @param count A size_t variable used within logic to decode data sets.
+   * @param data_model The data model being read/altered.
+   * @param line The line that is passed form the data set.
+   * @param type_class The type of class the current image in the data set is.
+   * @param testing_total The total amount of images in the file.
+   * @param testing_right The total amount of images the model guessed right.
+   * @param likelihood_scores The likelihood scores holding probabilities for being each class for each image
+   */
+  void CalculateAccuracy(size_t& count, DataModel& data_model, const std::string& line, size_t& type_class, 
+                         size_t& testing_total, size_t& testing_right, std::vector<float>& likelihood_scores);
   
   /**
    * Classifies the image drawn in on the sketchpad.
    * @param image The 2D vector corresponding to an image.
    * @return The model's prediction.
    */
-  int ClassifyImage(std::vector<std::vector<bool>> image);
+  int ClassifyImage(const std::vector<std::vector<bool>>& image);
   
   /** Getters */
   size_t GetImageDimensions() const;
