@@ -1,8 +1,8 @@
 #include <core/data_model.h>
-#include <core/classifier.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <core/classifier.h>
 
 namespace naivebayes {
 DataModel::DataModel() {

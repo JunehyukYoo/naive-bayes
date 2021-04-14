@@ -1,12 +1,11 @@
-#include <core/classifier.h>
 #include <iostream>
-#include <sstream>
 #include <fstream>
+#include <core/classifier.h>
 
 namespace naivebayes {
-  
-size_t Classifier::ClassifyImage(const visualizer::Sketchpad &sketchpad, const DataModel &data_model) {
-  std::vector<std::vector<bool>> image = sketchpad.GetSketchPad();
+
+
+size_t Classifier::ClassifyImage(const std::vector<std::vector<bool>> &image, const DataModel &data_model) {
   std::vector<float> likelihood_scores;
   for (size_t i = 0; i < data_model.GetNumOfClasses(); i++) {
     if (data_model.GetPriorFromClass(i) == 0) {
@@ -27,6 +26,7 @@ size_t Classifier::ClassifyImage(const visualizer::Sketchpad &sketchpad, const D
       }
     }
   }
+
 
   int classification = -10;
   float greatest_prob = -std::numeric_limits<float>::max();
@@ -101,7 +101,10 @@ void Classifier::ReadFileByLine(size_t &count, const DataModel &data_model, cons
       }
     }
     if (class_ == type_class) {
+      std::cout << "Right" << std::endl;
       testing_right++;
+    } else {
+      std::cout << "Wrong" << std::endl;
     }
   }
   count++;

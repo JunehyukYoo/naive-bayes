@@ -1,6 +1,5 @@
 #include <catch2/catch.hpp>
 
-#include <core/classifier.h>
 #include <fstream>
 #include <iostream>
 #include <core/data_model.h>

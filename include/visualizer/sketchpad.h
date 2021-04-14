@@ -2,6 +2,7 @@
 
 #include "cinder/gl/gl.h"
 
+
 namespace naivebayes {
 
 namespace visualizer {
