@@ -30,9 +30,10 @@ class Classifier {
    * @param testing_right The total number of images guessed right by the model
    * @param likelihood_scores The likelihood scores of the current image for all classes
    */
-  static void ReadFileByLine(size_t &count, const DataModel &data_model, const std::string &line, size_t &type_class,
-                      size_t &testing_total, size_t &testing_right,
-                      std::vector<float> &likelihood_scores);
+  static void ReadFileByLine(size_t& count, const DataModel& data_model, const std::string& line, size_t& type_class,
+                      size_t& testing_total, size_t& testing_right, std::vector<float>& curr_likelihood_scores, 
+                      const std::vector<float>& likelihood_scores_with_priors);
+  
  private:
   static const char kShadedOne = '#';
   static const char kShadedTwo = '+';

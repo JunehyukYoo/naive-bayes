@@ -47,59 +47,64 @@ float Classifier::CalculateAccuracy(const std::string &testing_file, const DataM
     size_t count = 1;
     size_t num_total = 0;
     size_t num_right = 0;
-    std::vector<float> likelihood_scores(data_model.GetNumOfClasses());
-    while (getline(test_file, line)) {
-      ReadFileByLine(count, data_model, line, type_class, num_total, num_right, likelihood_scores);
+    std::vector<float> curr_likelihood_scores(data_model.GetNumOfClasses());
+    std::vector<float> likelihood_scores_with_priors(data_model.GetNumOfClasses());
+    for (size_t i = 0; i < data_model.GetNumOfClasses(); i++) {
+      likelihood_scores_with_priors[i] = log(data_model.GetPriorFromClass(i));
     }
-    auto model_accuracy_ = static_cast<float>(num_right/(num_total));
-    std::cout << "The model accuracy is: " + std::to_string(model_accuracy_) << std::endl;
-    return model_accuracy_;
+    while (getline(test_file, line)) {
+      ReadFileByLine(count, data_model, line, type_class, num_total, num_right, curr_likelihood_scores, likelihood_scores_with_priors);
+    }
+    auto accuracy = static_cast<float>(num_right/num_total);
+    std::cout << "Num right: " + std::to_string(num_right) + ", Num total: " + std::to_string(num_total) << std::endl;
+    std::cout << "The model accuracy is: " + std::to_string(accuracy) << std::endl;
+    return accuracy;
   } else {
     throw std::invalid_argument("Invalid testing images and labels file.");
   }
 }
 
-void Classifier::ReadFileByLine(size_t &count, const DataModel &data_model, const std::string &line, size_t &type_class,
-                                size_t &testing_total, size_t &testing_right,
-                                std::vector<float> &likelihood_scores) {
+void Classifier::ReadFileByLine(size_t& count, const DataModel& data_model, const std::string& line, size_t& type_class,
+                                size_t& testing_total, size_t& testing_right, std::vector<float>& curr_likelihood_scores,
+                                const std::vector<float>& likelihood_scores_with_priors) {
   size_t one_image_line_req = data_model.GetImageDimensions() + 1;
-
+  
   if (count > one_image_line_req) {
     count = 1;
   }
+  
   if (count == 1) {
     try {
       type_class = stoi(line);
     } catch (...) {
       throw std::invalid_argument("Broken Training File");
     }
-    for (size_t i = 0; i < data_model.GetNumOfClasses(); i++) {
-      likelihood_scores[i] = log(data_model.GetPriorFromClass(i));
-    }
+    curr_likelihood_scores = likelihood_scores_with_priors;
     testing_total++;
   } else {
     for (size_t col = 0; col < data_model.GetImageDimensions(); col++) {
       if (line.at(col) == kShadedOne || line.at(col) == kShadedTwo) {
         for (size_t i = 0; i < data_model.GetNumOfClasses(); i++) {
-          likelihood_scores[i] += log(data_model.GetShadedProbabilities().at(i)[count - 2][col]);
+          curr_likelihood_scores[i] += log(data_model.GetShadedProbabilities().at(i)[count - 2][col]);
         }
       } else {
         for (size_t i = 0; i < data_model.GetNumOfClasses(); i++) {
-          likelihood_scores[i] += log(data_model.GetUnshadedProbabilities().at(i)[count - 2][col]);
+          curr_likelihood_scores[i] += log(data_model.GetUnshadedProbabilities().at(i)[count - 2][col]);
         }
       }
     }
   }
-
+  
   if (count == one_image_line_req) {
     float greatest = -std::numeric_limits<float>::max();
     size_t class_;
     for (size_t i = 0; i < data_model.GetNumOfClasses(); i++) {
-      if (likelihood_scores[i] > greatest) {
-        greatest = likelihood_scores[i];
+      if (curr_likelihood_scores[i] > greatest) {
+        greatest = curr_likelihood_scores[i];
         class_ = i;
       }
     }
+    curr_likelihood_scores.clear();
     if (class_ == type_class) {
       std::cout << "Right" << std::endl;
       testing_right++;
@@ -109,5 +114,6 @@ void Classifier::ReadFileByLine(size_t &count, const DataModel &data_model, cons
   }
   count++;
 }
+
 
 } // namespace naivebayes
