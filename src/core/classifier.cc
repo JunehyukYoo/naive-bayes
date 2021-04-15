@@ -4,6 +4,9 @@
 
 namespace naivebayes {
 
+Classifier::Classifier() {
+  model_accuracy_ = 0;
+}
 
 size_t Classifier::ClassifyImage(const std::vector<std::vector<bool>> &image, const DataModel &data_model) {
   std::vector<float> likelihood_scores;
@@ -39,7 +42,7 @@ size_t Classifier::ClassifyImage(const std::vector<std::vector<bool>> &image, co
   return classification;
 }
 
-float Classifier::CalculateAccuracy(const std::string &testing_file, const DataModel &data_model) {
+void Classifier::CalculateAccuracy(const std::string &testing_file, const DataModel &data_model) {
   std::ifstream test_file(testing_file);
   if (test_file.is_open()) {
     std::string line;
@@ -55,10 +58,9 @@ float Classifier::CalculateAccuracy(const std::string &testing_file, const DataM
     while (getline(test_file, line)) {
       ReadFileByLine(count, data_model, line, type_class, num_total, num_right, curr_likelihood_scores, likelihood_scores_with_priors);
     }
-    auto accuracy = static_cast<float>(num_right/num_total);
+    model_accuracy_ = static_cast<float>(num_right/num_total);
     std::cout << "Num right: " + std::to_string(num_right) + ", Num total: " + std::to_string(num_total) << std::endl;
-    std::cout << "The model accuracy is: " + std::to_string(accuracy) << std::endl;
-    return accuracy;
+    std::cout << "The model accuracy is: " + std::to_string(model_accuracy_) << std::endl;
   } else {
     throw std::invalid_argument("Invalid testing images and labels file.");
   }
@@ -104,6 +106,7 @@ void Classifier::ReadFileByLine(size_t& count, const DataModel& data_model, cons
         class_ = i;
       }
     }
+    curr_likelihood_scores_ = curr_likelihood_scores;
     curr_likelihood_scores.clear();
     if (class_ == type_class) {
       std::cout << "Right" << std::endl;
@@ -113,6 +116,14 @@ void Classifier::ReadFileByLine(size_t& count, const DataModel& data_model, cons
     }
   }
   count++;
+}
+
+std::vector<float> Classifier::GetCurrentLikelihoodScores() const {
+  return curr_likelihood_scores_;
+}
+
+float Classifier::GetModelAccuracy() const {
+  return model_accuracy_;
 }
 
 

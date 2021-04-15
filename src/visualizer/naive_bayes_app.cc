@@ -50,7 +50,7 @@ void NaiveBayesApp::keyDown(ci::app::KeyEvent event) {
         current_prediction_ = -1;
       } else {
         //current_prediction_ = data_model_.ClassifyImage(sketchpad_.GetSketchPad()); 
-        current_prediction_ = Classifier::ClassifyImage(sketchpad_.GetSketchPad(), data_model_);
+        current_prediction_ = classifier_.ClassifyImage(sketchpad_.GetSketchPad(), data_model_);
       }
       break;
 

@@ -87,12 +87,6 @@ class DataModel {
    */
   float GetPriorFromClass(const size_t& class_) const;
   
-  /**
-   * Method to test model accuracy (updates the model_accuracy_ variable)
-   * @param test_file_path A string with the path to the testing data set.
-   */
-  void CalculateModelAccuracy(const std::string& test_file_path);
-  
   /** Getters */
   size_t GetImageDimensions() const;
   size_t GetNumTotalImages() const;

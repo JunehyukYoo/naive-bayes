@@ -2,7 +2,6 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <core/classifier.h>
 
 namespace naivebayes {
 DataModel::DataModel() {
@@ -320,10 +319,6 @@ void DataModel::LoadProbabilities(size_t &count, DataModel &data_model, const st
   }
 }
 
-void DataModel::CalculateModelAccuracy(const std::string &test_file_path) {
-  model_accuracy_ = Classifier::CalculateAccuracy(test_file_path, *this);
-}
-
 std::vector<std::vector<std::vector<std::vector<size_t>>>> DataModel::GetRawData() const {
   return raw_data_;
 }
@@ -358,5 +353,6 @@ float DataModel::GetModelAccuracy() const {
 size_t DataModel::GetNumOfClasses() const {
   return kNumOfClasses;
 }
+
 
 }  // namespace naivebayes
