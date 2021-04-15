@@ -18,6 +18,7 @@ const std::string file_path_7 = "/Users/s200808/Documents/Cinder/my-projects/nai
 const std::string file_path_8 = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testnumber8.txt";
 const std::string file_path_9 = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testnumber9.txt";
 const std::string file_path_invalid_file = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testinvalidnumber.txt";
+const std::string file_path_empty_file = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testemptyfile.txt";
 
 const std::string error = "error";
 
@@ -115,4 +116,16 @@ TEST_CASE("Invalid label on testing file") {
   }
   naivebayes::Classifier classifier;
   REQUIRE_THROWS_AS(classifier.CalculateAccuracy(file_path_invalid_file, model), std::invalid_argument);
+}
+
+TEST_CASE("Empty testing file") {
+  naivebayes::DataModel model(3);
+  std::ifstream input_file(file_path_small_training_images);
+  if (input_file.is_open()) {
+    input_file >> model;
+  } else {
+    std::cerr << error << std::endl;
+  }
+  naivebayes::Classifier classifier;
+  REQUIRE_THROWS_AS(classifier.CalculateAccuracy(file_path_empty_file, model), std::invalid_argument);
 }

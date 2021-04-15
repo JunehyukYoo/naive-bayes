@@ -58,6 +58,9 @@ void Classifier::CalculateAccuracy(const std::string &testing_file, const DataMo
     while (getline(test_file, line)) {
       ReadFileByLine(count, data_model, line, type_class, num_total, num_right, curr_likelihood_scores, likelihood_scores_with_priors);
     }
+    if (num_total == 0) {
+      throw std::invalid_argument("Empty testing file.");
+    }
     model_accuracy_ = static_cast<float>(num_right/num_total);
     std::cout << "Num right: " + std::to_string(num_right) + ", Num total: " + std::to_string(num_total) << std::endl;
     std::cout << "The model accuracy is: " + std::to_string(model_accuracy_) << std::endl;
