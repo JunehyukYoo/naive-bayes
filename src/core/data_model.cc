@@ -346,13 +346,7 @@ std::unordered_map<size_t, std::vector<std::vector<float>>> DataModel::GetUnshad
   return unshaded_probabilities_;
 }
 
-float DataModel::GetModelAccuracy() const {
-  return model_accuracy_;
-}
-
 size_t DataModel::GetNumOfClasses() const {
   return kNumOfClasses;
 }
-
-
 }  // namespace naivebayes

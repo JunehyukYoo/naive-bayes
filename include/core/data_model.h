@@ -95,13 +95,11 @@ class DataModel {
   std::unordered_map<size_t, std::vector<std::vector<float>>> GetShadedProbabilities() const;
   std::unordered_map<size_t, std::vector<std::vector<float>>> GetUnshadedProbabilities() const;
   std::unordered_map<size_t, float> GetPriors() const;
-  float GetModelAccuracy() const;
   size_t GetNumOfClasses() const;
 
  private:
   size_t image_dimensions_;
   size_t num_total_images_;
-  float model_accuracy_;
   
   /** class -> num of images of class */
   std::unordered_map<size_t, size_t> num_class_;

@@ -79,7 +79,10 @@ void Classifier::ReadFileByLine(size_t& count, const DataModel& data_model, cons
     try {
       type_class = stoi(line);
     } catch (...) {
-      throw std::invalid_argument("Broken Training File");
+      throw std::invalid_argument("Broken Testing File");
+    }
+    if (type_class + 1 > data_model.GetNumOfClasses()) {
+      throw std::invalid_argument("Invalid label in file");
     }
     curr_likelihood_scores = likelihood_scores_with_priors;
     testing_total++;
