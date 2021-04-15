@@ -11,6 +11,8 @@ const std::string file_path_0 = "/Users/s200808/Documents/Cinder/my-projects/nai
 const std::string file_path_1 = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testnumber1.txt";
 const std::string file_path_2 = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testnumber2.txt";
 const std::string file_path_3 = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testnumber3.txt";
+const std::string file_path_4 = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testnumber4.txt";
+const std::string file_path_5 = "/Users/s200808/Documents/Cinder/my-projects/naive-bayes/data/small-images-and-labels-data-sets/testnumber5.txt";
 
 const std::string error = "error";
 
@@ -59,5 +61,17 @@ TEST_CASE("Verify likelihood scores") {
     classifier.CalculateAccuracy(file_path_3, model);
     std::vector<float> likelihood_scores = classifier.GetCurrentLikelihoodScores();
     REQUIRE(likelihood_scores[3] == Approx(log(0.142857) + 9 * log(0.666667)).margin(0.001));
+  }
+  SECTION("Number = 4") {
+    naivebayes::Classifier classifier;
+    classifier.CalculateAccuracy(file_path_4, model);
+    std::vector<float> likelihood_scores = classifier.GetCurrentLikelihoodScores();
+    REQUIRE(likelihood_scores[4] == Approx(log(0.071429) + 9 * log(0.5)).margin(0.001));
+  }
+  SECTION("Number = 5") {
+    naivebayes::Classifier classifier;
+    classifier.CalculateAccuracy(file_path_5, model);
+    std::vector<float> likelihood_scores = classifier.GetCurrentLikelihoodScores();
+    REQUIRE(likelihood_scores[5] == Approx(log(0.071429) + 9 * log(0.5)).margin(0.001));
   }
 }
