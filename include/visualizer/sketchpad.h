@@ -2,6 +2,7 @@
 
 #include "cinder/gl/gl.h"
 
+
 namespace naivebayes {
 
 namespace visualizer {
@@ -49,10 +50,19 @@ class Sketchpad {
    */
   void Clear();
 
+  /**
+   * Gets the current 2D sketchpad vector.
+   * @return sketchpad_shaded_ 2D vector
+   */
+  std::vector<std::vector<bool>> GetSketchPad() const;
+
  private:
   glm::vec2 top_left_corner_;
 
   size_t num_pixels_per_side_;
+  
+  /** 2D vector representing the pixels in the sketchpad, true if shaded and false otherwise */
+  std::vector<std::vector<bool>> sketchpad_shaded_;
 
   /** Number of screen pixels in the width/height of one sketchpad pixel */
   double pixel_side_length_;
